@@ -12,12 +12,12 @@
 ++ Definimos rutas a directorios específicos para buscar o guardar datos
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
-path_models         = "../outputs/Output_Testing_02_TotalEigenProblemAndEvolution/models/";
-path_images         = "../outputs/Output_Testing_02_TotalEigenProblemAndEvolution/images/";
+path_models         = "../outputs/01_Code/models/";
+path_images         = "../outputs/01_Code/images/";
 path_modules        = "../modules/"
 path_gridap_makie   = "../gridap_makie/";
 path_videos         = "./videos/";
-path_plots          = "../outputs/Output_Testing_02_TotalEigenProblemAndEvolution/plots/";
+path_plots          = "../outputs/01_Code/plots/";
 
 
 #= +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -30,6 +30,7 @@ import Pkg; Pkg.activate(path_gridap_makie);
 install_packages=false;
 if install_packages
     import Pkg
+    Pkg.add("Gridap");
     Pkg.add("GridapGmsh");
     Pkg.add("Gmsh");
     Pkg.add("FileIO");
@@ -42,6 +43,11 @@ using Gridap.CellData;  # para construir condición inicial interpolando una fun
 using Gridap.FESpaces;  # para crear matrices afines a partir de formas bilineales
 using Gridap.Algebra;   # para utilizar operaciones algebraicas con Gridap
 
+install_packages=false;
+if install_packages
+    import Pkg
+    Pkg.add("Plots")
+end
 using Plots;
 
 # crear directorios en caso de no haberlo hecho
@@ -205,4 +211,83 @@ function bilineal_forms_eigenprob_H_ReImParts(p,q₁,q₂,r,s,dΩ)
     b((u₁,u₂,u₃,u₄),(v₁,v₂,v₃,v₄)) = b₁((u₁,v₁))+b₂((u₂,v₂))+b₃((u₃,v₃))+b₄((u₄,v₄))
 
     return a,b;
+end
+
+#=
+    función para obtener los puntos discretos de la grilla (valuados)
+    y un vector pts que almacena dichos puntos
+=#
+function space_coord(dom,Δx)
+    x=[dom[1]+abs(dom[2]-dom[1])*Δx*i for i in 1:convert(Int,1.0/Δx)];
+    pts=[Point(x[i]) for i in 1:convert(Int,1.0/ΔxH)];
+    return x,pts;
+end
+
+#=
+    función para calcular normalización de autoestados de
+    un hamiltoniano 1D
+=#
+function normalization_eigenstates_1D(ϕ,TrialSpace,dΩ)
+    nom_vec=zeros(Float64,length(ϕ))
+    for i in 1:length(ϕ)
+        ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
+        nom_vec[i]=norm_L2(ϕ[i],dΩ)
+    end
+    return nom_vec;
+end
+#=
+    función para calcular normalización de autoestados de
+    un hamiltoniano 2D
+=#
+function normalization_eigenstates_2D(ϕ,TrialSpace,dΩ)
+    nom_vec₁₂=zeros(Float64,length(ϕ))
+    for i in 1:length(ϕ)
+        ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
+        ϕ¹ᵢ,ϕ²ᵢ=ϕᵢ
+        norm_ϕ¹ᵢ=norm_L2(ϕ¹ᵢ,dΩ)
+        norm_ϕ²ᵢ=norm_L2(ϕ²ᵢ,dΩ)
+        nom_vec₁₂[i]=norm_ϕ¹ᵢ+norm_ϕ²ᵢ
+    end
+    return nom_vec₁₂;
+end
+#=
+    función para chequear ortogonalidad de autoestados de
+    un hamiltoniano 2D
+=#
+function OrthoCheck_2D(ϕ,TrialSpace,dΩ)
+    nev=length(ϕ)
+    OrthoVector=zeros(Float64,nev^2-nev);
+    index=1
+    for i in 1:nev
+        ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
+        ϕ¹ᵢ,ϕ²ᵢ=ϕᵢ
+        for j in 1:nev
+            if (i ≠ j)
+                ϕⱼ=interpolate_everywhere(ϕ[j],TrialSpace);
+                ϕ¹ⱼ,ϕ²ⱼ=ϕⱼ
+                OrthoVector[index]=abs(sum(∫(ϕ¹ⱼ'*ϕ¹ᵢ)*dΩ)+sum(∫(ϕ²ⱼ'*ϕ²ᵢ)*dΩ))
+                index+=1
+            end
+        end
+    end
+    return OrthoVector;
+end
+#=
+    función para calcular la populación de estados
+=#
+function Populations_2D(𝛹ₓₜ,TrialSpace,dΩ)
+    dimₜ=length(𝛹ₓₜ)
+    p¹ₜ=zeros(Float64,dimₜ);
+    p²ₜ=zeros(Float64,dimₜ);
+
+    for i in 1:dimₜ
+        𝛹ₓₜᵢ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace);
+        𝛹¹ₓₜᵢ,𝛹²ₓₜᵢ=𝛹ₓₜᵢ
+        norm_𝛹¹ₓₜᵢ=norm_L2(𝛹¹ₓₜᵢ,dΩ)
+        norm_𝛹²ₓₜᵢ=norm_L2(𝛹²ₓₜᵢ,dΩ)
+        p¹ₜ[i]=real(sum(∫(𝛹¹ₓₜᵢ'*𝛹¹ₓₜᵢ)*dΩ))/(norm_𝛹¹ₓₜᵢ)
+        p²ₜ[i]=real(sum(∫(𝛹²ₓₜᵢ'*𝛹²ₓₜᵢ)*dΩ))/(norm_𝛹²ₓₜᵢ)
+    end
+
+    return p¹ₜ,p²ₜ;
 end

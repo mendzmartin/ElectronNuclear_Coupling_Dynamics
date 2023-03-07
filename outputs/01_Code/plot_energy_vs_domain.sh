@@ -174,5 +174,29 @@ I = {0.0, 1.0}
 VoxelDistance = 0.0
 ## https://www.xmodulo.com/how-to-plot-using-specific-rows-of-data-file-with-gnuplot.html
 ## Last datafile plotted: "energy_vs_domain.dat"
-p 'energy_vs_domain.dat' u 4:2 every 20::19::100 w l notitle, 'energy_vs_domain.dat' u 4:3 every 20::19::100 w l notitle
+set terminal pdf size 8,8;set output 'result_plot_energy_vs_domain.pdf'
+
+set multiplot layout 2,2
+    set xlabel "max length (L )";set ylabel "energy \{epsilon_{h}} [au]"
+
+    set autoscale
+    set title "variational test - energy level n=0"
+    p   'energy_vs_domain.dat' u ($4**-1):2 every 20::(2-1)::(2+80-1) w l t 'exact',\
+        'energy_vs_domain.dat' u ($4**-1):3 every 20::(2-1)::(2+80-1) w l t 'numeric'
+
+    set autoscale
+    set title "variational test - energy level n=5"
+    p   'energy_vs_domain.dat' u ($4**-1):2 every 20::(7-1)::(7+80-1) w l t 'exact',\
+        'energy_vs_domain.dat' u ($4**-1):3 every 20::(7-1)::(7+80-1) w l t 'numeric'
+    
+    set autoscale
+    set title "variational test - energy level n=10"
+    p   'energy_vs_domain.dat' u ($4**-1):2 every 20::(12-1)::(12+80-1) w l t 'exact',\
+        'energy_vs_domain.dat' u ($4**-1):3 every 20::(12-1)::(12+80-1) w l t 'numeric'
+
+    set autoscale
+    set title "variational test - energy level n=20"
+    p   'energy_vs_domain.dat' u ($4**-1):2 every 20::(20-1)::(20+80-1) w l t 'exact',\
+        'energy_vs_domain.dat' u ($4**-1):3 every 20::(20-1)::(20+80-1) w l t 'numeric'
+unset multiplot
 #    EOF

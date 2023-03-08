@@ -137,20 +137,42 @@ function reference_FEspaces(method,type,order)
 end
 
 # funciones para problema de autovalores (ecuaciones de Sturm Liouville)
-pₕ(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
-qₕ(x) = 0.5*m*(ω*ω)*(x[1]-x₁)*(x[1]-x₁);                            # oscilador armónico 1D centrado en x₁
-qₕ_2D(x) = 0.5*m*(ω*ω)*((x[1]-x₁)*(x[1]-x₁)+(x[2]-y₁)*(x[2]-y₁));   # oscilador armónico 2D centrado en (x₁,y₁)
-rₕ(x) = 1.0;
+
+function eigenvalue_problem_functions(;switch_potential = "QHO_1D")
+    if (switch_potential == "QHO_1D")
+        # caso de potencial tipo quantum harmonic oscillator 1D (QHO)
+        @printf("Set quantum harmonic oscillator 1D potential\n");
+        pₕ_QHO_1D(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
+        qₕ_QHO_1D(x) = 0.5*m*(ω*ω)*(x[1]-x₁)*(x[1]-x₁);                            # oscilador armónico 1D centrado en x₁
+        rₕ_QHO_1D(x) = 1.0;
+        return pₕ_QHO_1D,qₕ_QHO_1D,rₕ_QHO_1D;
+    elseif (switch_potential == "QHO_2D")
+        # caso de potencial tipo quantum harmonic oscillator 2D (QHO)
+        @printf("Set quantum harmonic oscillator 2D potential\n");
+        pₕ_QHO_2D(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
+        qₕ_QHO_2D(x) = 0.5*m*(ω*ω)*((x[1]-x₁)*(x[1]-x₁)+(x[2]-y₁)*(x[2]-y₁));   # oscilador armónico 2D centrado en (x₁,y₁)
+        rₕ_QHO_2D(x) = 1.0;
+        return pₕ_QHO_2D,qₕ_QHO_2D,rₕ_QHO_2D;
+    elseif (switch_potential == "FWP")
+        # caso de potencial tipo finite well potential (FWP)
+        @printf("Set quantum finite well potential\n");
+        pₕ_FWP(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
+        # qₕ(x;V₀_FWP=-5.0,a_FWP=2.0) = interval.(x[1],-a_FWP,a_FWP,V₀_FWP)
+        qₕ_FWP(x) = -2.5*(sign(x[1]+2.0)+sign(2.0-x[1]));
+        rₕ_FWP(x) = 1.0;
+        return pₕ_FWP,qₕ_FWP,rₕ_FWP;
+    end
+end
 
 # Formas bilineales para problema de autovalores (espacios complejos)
 #  deben verificar la integración por partes
-function bilineal_forms(p,q,r,dΩ)
+function bilineal_forms(p,q,r,dΩ;switch_potential="QHO_1D")
     a(u,v) = ∫(p*∇(v)⋅∇(u)+q*v*u)*dΩ;
     b(u,v) = ∫(r*u*v)dΩ;
     return a,b;
 end
 
-function bilineal_forms_ReImParts(p,q,r,dΩ)
+function bilineal_forms_ReImParts(p,q,r,dΩ;switch_potential="QHO_1D")
     a₁((u₁,v₁))=∫(p*(∇(v₁)⋅∇(u₁))+q*(v₁*u₁))dΩ;
     b₁((u₁,v₁))=∫(r*(v₁*u₁))dΩ;
 
@@ -177,6 +199,8 @@ end
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
 # funciones para problema de autovalores (ecuaciones de Sturm Liouville)
+
+# caso de potencial tipo harmonic oscillator
 pH(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
 qH₁(x) = 0.5*m*(ω*ω)*(x[1]-x₁)*(x[1]-x₁);                           # oscilador armónico 1D centrado en x₁
 qH₂(x) = 0.5*m*(ω*ω)*(x[1]-x₂)*(x[1]-x₂);                           # oscilador armónico 1D centrado en x₂
@@ -290,4 +314,17 @@ function Populations_2D(𝛹ₓₜ,TrialSpace,dΩ)
     end
 
     return p¹ₜ,p²ₜ;
+end
+
+#=
+    funcion auxiliar para calcular función de heaviside
+    y construir un pozo cuadrado de potencial
+=#
+
+function heaviside(x)
+    0.5*(sign(x)+1)
+ end
+
+function interval(x,x₁,x₂,A)
+   A*(heaviside(x-x₁)-heaviside(x-x₂))
 end

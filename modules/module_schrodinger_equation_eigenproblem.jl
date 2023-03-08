@@ -157,8 +157,8 @@ function eigenvalue_problem_functions(;switch_potential = "QHO_1D")
         # caso de potencial tipo finite well potential (FWP)
         @printf("Set quantum finite well potential\n");
         pₕ_FWP(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
-        # qₕ(x;V₀_FWP=-5.0,a_FWP=2.0) = interval.(x[1],-a_FWP,a_FWP,V₀_FWP)
-        qₕ_FWP(x) = -2.5*(sign(x[1]+2.0)+sign(2.0-x[1]));
+        qₕ_FWP(x;V₀_FWP=-5.0,a_FWP=10.0) = interval.(x[1],-a_FWP,a_FWP,V₀_FWP)
+        # qₕ_FWP(x) = -2.5*(sign(x[1]+2.0)+sign(2.0-x[1]));
         rₕ_FWP(x) = 1.0;
         return pₕ_FWP,qₕ_FWP,rₕ_FWP;
     end

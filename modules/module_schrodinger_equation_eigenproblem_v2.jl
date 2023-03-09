@@ -104,17 +104,10 @@ include(path_modules*"module_mesh_generator.jl");   # módulo para construir gri
 
 # declaramos parámetros constantes (utilizando sistema atómico de unidades)
 const m=1.0;                            # masa
-const ω=1.0;                            # frecuencia angular
 const ħ=1.0;                            # constante de Planck
-const x₁=0.0;                           # posición donde se centra el 1er osc. armónico
-const x₂=2.0;                           # posición donde se centra el 2do osc. armónico
-const γ=0.1;                            # constante de acoplamiento
-const α=im*ħ*0.5*(1.0/m);               # factor multiplicativo energía cinética
-const αconst=-im*0.5*m*(ω*ω)*(1.0/ħ);   # factor multiplicativo potencial armónico
 
-@printf("VARIABLES GLOBALES:\n");
-@printf("m=%.4f (mass)\nω=%.4f (frecuency)\nħ=%.4f (Planck constant)\nγ=%.4f (coupling)\n",m,ω,ħ,γ);
-@printf("x₁=%.4f x₂=%.4f (QHO origin position)\n",x₁,x₂);
+α=im*ħ*0.5*(1.0/m);               # factor multiplicativo energía cinética
+αconst(ω)=-im*0.5*m*(ω*ω)*(1.0/ħ);   # factor multiplicativo potencial armónico
 
 #= +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++ Funciones útiles
@@ -138,10 +131,11 @@ end
 
 # funciones para problema de autovalores (ecuaciones de Sturm Liouville)
 
-function eigenvalue_problem_functions(;switch_potential = "QHO_1D")
+function eigenvalue_problem_functions(params;switch_potential = "QHO_1D")
     if (switch_potential == "QHO_1D")
         # caso de potencial tipo quantum harmonic oscillator 1D (QHO)
         @printf("Set quantum harmonic oscillator 1D potential\n");
+        ω,x₁,x₂=params;
         pₕ_QHO_1D(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
         qₕ_QHO_1D(x) = 0.5*m*(ω*ω)*(x[1]-x₁)*(x[1]-x₁);                            # oscilador armónico 1D centrado en x₁
         rₕ_QHO_1D(x) = 1.0;
@@ -149,6 +143,7 @@ function eigenvalue_problem_functions(;switch_potential = "QHO_1D")
     elseif (switch_potential == "QHO_2D")
         # caso de potencial tipo quantum harmonic oscillator 2D (QHO)
         @printf("Set quantum harmonic oscillator 2D potential\n");
+        ω,x₁,x₂,y₁,y₂=params;
         pₕ_QHO_2D(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
         qₕ_QHO_2D(x) = 0.5*m*(ω*ω)*((x[1]-x₁)*(x[1]-x₁)+(x[2]-y₁)*(x[2]-y₁));   # oscilador armónico 2D centrado en (x₁,y₁)
         rₕ_QHO_2D(x) = 1.0;
@@ -156,6 +151,7 @@ function eigenvalue_problem_functions(;switch_potential = "QHO_1D")
     elseif (switch_potential == "FWP")
         # caso de potencial tipo finite well potential (FWP)
         @printf("Set quantum finite well potential\n");
+        V₀_FWP,a_FWP=params;
         pₕ_FWP(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
         qₕ_FWP(x) = interval.(x[1],-a_FWP,a_FWP,V₀_FWP)
         rₕ_FWP(x) = 1.0;
@@ -163,13 +159,7 @@ function eigenvalue_problem_functions(;switch_potential = "QHO_1D")
     end
 end
 
-# Formas bilineales para problema de autovalores (espacios complejos)
-#  deben verificar la integración por partes
-function bilineal_forms(p,q,r,dΩ;switch_potential="QHO_1D")
-    a(u,v) = ∫(p*∇(v)⋅∇(u)+q*v*u)*dΩ;
-    b(u,v) = ∫(r*u*v)dΩ;
-    return a,b;
-end
+# Formas bilineales para problema de autovalores (parte Re e Im por separado)
 
 function bilineal_forms_ReImParts(p,q,r,dΩ;switch_potential="QHO_1D")
     a₁((u₁,v₁))=∫(p*(∇(v₁)⋅∇(u₁))+q*(v₁*u₁))dΩ;
@@ -190,51 +180,8 @@ function norm_L2(u,dΩ)
 end
 
 # funciones para hamiltoniano 2x2 1D
-α₁(x)=αconst*(x[1]-x₁)*(x[1]-x₁); # oscilador armónico 1D centrado en x₁
-α₂(x)=αconst*(x[1]-x₂)*(x[1]-x₂); # oscilador armónico 1D centrado en x₂
-
-#= +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++ Funciones útiles para el problema de autovalores completo
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
-
-# funciones para problema de autovalores (ecuaciones de Sturm Liouville)
-
-# caso de potencial tipo harmonic oscillator
-pH(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
-qH₁(x) = 0.5*m*(ω*ω)*(x[1]-x₁)*(x[1]-x₁);                           # oscilador armónico 1D centrado en x₁
-qH₂(x) = 0.5*m*(ω*ω)*(x[1]-x₂)*(x[1]-x₂);                           # oscilador armónico 1D centrado en x₂
-rH(x) = 1.0;
-sH(x) = γ;
-
-function bilineal_forms_eigenprob_H(p,q₁,q₂,r,s,dΩ)
-    a((u₁,u₂),(v₁,v₂)) = ∫(p*(∇(v₁)⋅∇(u₁)+∇(v₂)⋅∇(u₂))+q₁*v₁*u₁+q₂*v₂*u₂+s*(v₁*u₁+v₂*u₂))*dΩ;
-    b((u₁,u₂),(v₁,v₂)) = ∫(r*(v₁*u₁+v₂*u₂))dΩ;
-    return a,b;
-end
-
-function bilineal_forms_eigenprob_H_ReImParts(p,q₁,q₂,r,s,dΩ)
-
-    # parte real de la 1er coordenada
-    a₁((u₁,u₃),v₁)=∫(p*(∇(v₁)⋅∇(u₁))+q₁*(v₁*u₁)+s*(v₁*u₃))*dΩ;
-    b₁((u₁,v₁))=∫(r*(v₁*u₁))*dΩ;
-
-    # parte imaginaria de la 1er coordenada
-    a₂((u₂,u₄),v₂)=∫(p*(∇(v₂)⋅∇(u₂))+q₁*(v₂*u₂)+s*(v₂*u₄))*dΩ;
-    b₂((u₂,v₂))=∫(r*(v₂*u₂))*dΩ;
-
-    # parte real de la 2da coordenada
-    a₃((u₃,u₁),v₃)=∫(p*(∇(v₃)⋅∇(u₃))+q₂*(v₃*u₃)+s*(v₃*u₁))*dΩ;
-    b₃((u₃,v₃))=∫(r*(v₃*u₃))*dΩ;
-
-    # parte imaginaria de la 2da coordenada
-    a₄((u₄,u₂),v₄)=∫(p*(∇(v₄)⋅∇(u₄))+q₂*(v₄*u₄)+s*(v₄*u₂))*dΩ;
-    b₄((u₄,v₄))=∫(r*(v₄*u₄))*dΩ;
-
-    a((u₁,u₂,u₃,u₄),(v₁,v₂,v₃,v₄)) = a₁((u₁,u₃),v₁)+a₂((u₂,u₄),v₂)+a₃((u₃,u₁),v₃)+a₄((u₄,u₂),v₄)
-    b((u₁,u₂,u₃,u₄),(v₁,v₂,v₃,v₄)) = b₁((u₁,v₁))+b₂((u₂,v₂))+b₃((u₃,v₃))+b₄((u₄,v₄))
-
-    return a,b;
-end
+α₁(x,(x₁,x₂,ω))=αconst(ω)*(x[1]-x₁)*(x[1]-x₁); # oscilador armónico 1D centrado en x₁
+α₂(x,(x₁,x₂,ω))=αconst(ω)*(x[1]-x₂)*(x[1]-x₂); # oscilador armónico 1D centrado en x₂
 
 #=
     función para obtener los puntos discretos de la grilla (valuados)
@@ -242,7 +189,7 @@ end
 =#
 function space_coord(dom,Δx)
     x=[dom[1]+abs(dom[2]-dom[1])*Δx*i for i in 1:convert(Int,1.0/Δx)];
-    pts=[Point(x[i]) for i in 1:convert(Int,1.0/ΔxH)];
+    pts=[Point(x[i]) for i in 1:convert(Int,1.0/Δx)];
     return x,pts;
 end
 

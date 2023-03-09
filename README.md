@@ -1,14 +1,8 @@
 # ElectronNuclear_Coupling_Dynamics
+
 Repository to quantum simulations of Electron-Nuclear coupling dynamics
 
-
-# Detailed repository information
-
-
-+ code folder
-
-> ´´´01_Code.ipynb´´´ Julia code to simulate quantum dynamics of quantum harmonic oscillator 1D.
-
-+ modules folder
-
-+ outputs folder
+Please for more information related to repository content and research work see:
+* [ElectronNuclear_Coupling_Dynamics wiki](https://github.com/mendzmartin/ElectronNuclear_Coupling_Dynamics/wiki)
+* [Faculty of Mathematic, Astronomy, Physics and Computation (FaMAF)](https://www.famaf.unc.edu.ar/)
+* The Enrique Gaviola Institute of Physics (IFEG)

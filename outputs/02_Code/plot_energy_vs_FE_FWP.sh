@@ -184,17 +184,17 @@ set multiplot layout 2,2
 
     set autoscale
     set title "variational test - energy level n=1"
-    p   'energy_vs_FE_FWP.dat' u 4:2 every nev::0 w l t 'exact',\
-        'energy_vs_FE_FWP.dat' u 4:3 every nev::0 w l t 'numeric'
+    p   'energy_vs_FE_FWP.dat' u 4:2 every nev::0 w l lw 3 t 'exact',\
+        'energy_vs_FE_FWP.dat' u 4:3 every nev::0 w l lw 3 t 'numeric'
 
     set autoscale
     set title "variational test - energy level n=2"
-    p   'energy_vs_FE_FWP.dat' u 4:2 every nev::1 w l t 'exact',\
-        'energy_vs_FE_FWP.dat' u 4:3 every nev::1 w l t 'numeric'
+    p   'energy_vs_FE_FWP.dat' u 4:2 every nev::1 w l lw 3 t 'exact',\
+        'energy_vs_FE_FWP.dat' u 4:3 every nev::1 w l lw 3 t 'numeric'
     
     set autoscale
     set title "variational test - energy level n=3"
-    p   'energy_vs_FE_FWP.dat' u 4:2 every nev::2 w l t 'exact',\
-        'energy_vs_FE_FWP.dat' u 4:3 every nev::2 w l t 'numeric'
+    p   'energy_vs_FE_FWP.dat' u 4:2 every nev::2 w l lw 3 t 'exact',\
+        'energy_vs_FE_FWP.dat' u 4:3 every nev::2 w l lw 3 t 'numeric'
 unset multiplot
 #    EOF

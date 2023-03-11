@@ -272,6 +272,26 @@ function Populations_2D(𝛹ₓₜ,TrialSpace,dΩ)
 end
 
 #=
+    function to calculate differential Shannon entropy
+=#
+function Diff_Shannon_Entropy_1D(𝛹ₓ,TrialSpace,dΩ,pts)
+    dim𝛹ₓ=length(𝛹ₓ)
+    𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[1],TrialSpace);
+    S=zeros(Float64,dim𝛹ₓ)
+    for i in 1:dim𝛹ₓ
+        𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[i],TrialSpace);
+        𝛹ₓᵢ=𝛹ₓᵢ/norm_L2(𝛹ₓᵢ,dΩ);
+
+        ρₓᵢ=𝛹ₓᵢ'*𝛹ₓᵢ
+        S[i]=real(sum(∫(ρₓᵢ->(-ρₓᵢ*log(ρₓᵢ)))*dΩ))
+
+        # ρₓᵢ=(𝛹ₓᵢ'.(pts)).*(𝛹ₓᵢ.(pts));
+        # S[i]=real(sum(∫(ρₓᵢ*log.(ρₓᵢ))*dΩ));
+    end
+    return S;
+end
+
+#=
     funcion auxiliar para calcular función de heaviside
     y construir un pozo cuadrado de potencial
 =#

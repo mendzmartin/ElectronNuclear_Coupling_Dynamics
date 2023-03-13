@@ -157,15 +157,24 @@ function eigenvalue_problem_functions(params;switch_potential = "QHO_1D")
         qₕ_FWP(x) = interval.(x[1],-a_FWP,a_FWP,V₀_FWP)
         rₕ_FWP(x) = 1.0;
         return pₕ_FWP,qₕ_FWP,rₕ_FWP;
-    elseif (switch_potential == "Electron_Nuclear_Potential")
+    elseif (switch_potential == "Electron_Nuclear_Potential_1D")
+        # caso de potencial tipo interacción electron-nucleo en pozo nuclear
+        @printf("Set Electron-Nuclear potential with fixed R\n");
+        R,R₁,R₂,Rc,Rf=params;
+        pₕ_ENP_1D(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
+        qₕ_ENP_1D(x) = CoulombPotential(R,R₁)+CoulombPotential(R,R₂)+
+            Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],R,Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
+        rₕ_ENP_1D(x) = 1.0;
+        return pₕ_ENP_1D,qₕ_ENP_1D,rₕ_ENP_1D;
+    elseif (switch_potential == "Electron_Nuclear_Potential_2D")
         # caso de potencial tipo interacción electron-nucleo en pozo nuclear
         @printf("Set Electron-Nuclear potential\n");
         R,R₁,R₂,Rc,Rf=params;
-        pₕ_ENP(x) = 0.5*(ħ*ħ)*(1.0/m+1.0/M);                                          # factor para energía cinética
-        qₕ_ENP(x) = CoulombPotential(R,R₁)+CoulombPotential(R,R₂)+
-            Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],R,Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
-        rₕ_ENP(x) = 1.0;
-        return pₕ_ENP,qₕ_ENP,rₕ_ENP;
+        pₕ_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/m+1.0/M);                                          # factor para energía cinética
+        qₕ_ENP_2D(x) = CoulombPotential(x[2],R₁)+CoulombPotential(x[2],R₂)+
+            Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],x[2],Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
+        rₕ_ENP_2D(x) = 1.0;
+        return pₕ_ENP_2D,qₕ_ENP_2D,rₕ_ENP_2D;
     end
 end
 
@@ -274,7 +283,26 @@ end
 #=
     function to calculate differential Shannon entropy
 =#
-function Diff_Shannon_Entropy_1D(𝛹ₓ,TrialSpace,dΩ,pts)
+"""
+    https://en.wikipedia.org/wiki/Natural_logarithm
+"""
+function ln_aprox(x,n)
+    result = 1.0
+    for i in 1:n
+        result = pow(-1.0,i-1)*pow((x-1),i)*(1.0/i)
+    end
+    return result
+end
+
+function pow(x,n)
+    result = 1.0
+    for i in 1:n
+        result=result*x
+    end
+    return result
+end
+
+function TimeIndependet_Diff_Shannon_Entropy_1D(𝛹ₓ,TrialSpace,dΩ)
     dim𝛹ₓ=length(𝛹ₓ)
     𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[1],TrialSpace);
     S=zeros(Float64,dim𝛹ₓ)
@@ -282,11 +310,14 @@ function Diff_Shannon_Entropy_1D(𝛹ₓ,TrialSpace,dΩ,pts)
         𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[i],TrialSpace);
         𝛹ₓᵢ=𝛹ₓᵢ/norm_L2(𝛹ₓᵢ,dΩ);
 
-        ρₓᵢ=𝛹ₓᵢ'*𝛹ₓᵢ
-        S[i]=real(sum(∫(ρₓᵢ->(-ρₓᵢ*log(ρₓᵢ)))*dΩ))
-
-        # ρₓᵢ=(𝛹ₓᵢ'.(pts)).*(𝛹ₓᵢ.(pts));
-        # S[i]=real(sum(∫(ρₓᵢ*log.(ρₓᵢ))*dΩ));
+        ρₓᵢ=real(𝛹ₓᵢ'*𝛹ₓᵢ)
+        if ρₓᵢ==0.0
+            S[i]=0.0;
+            @printf("ERROR! ρₓᵢ=0, we can't compute Shannon entropy\n");
+        else
+            S[i]=-sum(integrate(ρₓᵢ*ln_aprox(ρₓᵢ,20),dΩ))
+            # S[i]=-sum(∫((ρₓᵢ*ln_aprox(ρₓᵢ,10))*dΩ))
+        end
     end
     return S;
 end
@@ -313,3 +344,63 @@ end
 
 using SpecialFunctions;
 Aprox_Coulomb_Potential(r,r₀,R)=-erf(abs(r₀-r)*(1.0/R))*CoulombPotential(r,r₀)
+
+
+#=
+    Function to find initial state descomposition coefficients
+=#
+function CoeffInit_1D(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    dim=length(ϕₙ)
+    InnerProdEigenvecs=zeros(ComplexF64,dim,dim);   # matriz global de inversas de productos internos entre autoestados
+    InnerProdBC=zeros(ComplexF64,dim);              # vector global de productos internos entre autoestados y estado inicial
+    # primer submatriz n✖n y subvector n✖1
+    for i in 1:dim
+        ϕᵢ=interpolate_everywhere(ϕₙ[i],TrialSpace);
+        InnerProdBC[i]=sum(∫(ϕᵢ'*𝛹ₓ₀)*dΩ)
+        for j in i:dim
+            ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
+            InnerProdEigenvecs[i,j]=(sum(∫(ϕᵢ'*ϕⱼ)*dΩ)+sum(∫(ϕᵢ'*ϕⱼ)*dΩ))
+            if (i≠j) # optimización por simetría
+                InnerProdEigenvecs[j,i]=conj(InnerProdEigenvecs[i,j])
+            end
+        end
+    end
+    # x=A\b
+    coeffvec₁₂=InnerProdEigenvecs\InnerProdBC;
+    return coeffvec₁₂;
+end
+
+
+#=
+    Function to evolve quantum system
+=#
+function evolution_schrodinger_1D(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
+    dim_time=length(time_vec)
+    dim_eigenval=length(ϵₙ)
+    # calculamos los coeficientes de la superposición lineal
+    coeffvec₁₂=CoeffInit_1D(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    𝛹ₓₜ=Vector{CellField}(undef,dim_time);
+    # inicializamos en cero el vector de onda
+    ϕ₁=interpolate_everywhere(ϕₙ[1],TrialSpace);
+    for i in 1:dim_time
+        𝛹ₓₜ[i]=interpolate_everywhere(0.0*ϕ₁,TrialSpace)
+    end
+    for i in 1:dim_time
+        for j in 1:dim_eigenval
+            𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
+            ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
+            factor=coeffvec₁₂[j]*exp(-im*(1.0/ħ)*ϵₙ[j]*time_vec[i])
+            𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ+factor*ϕⱼ),TrialSpace)
+        end
+        # normalizamos la función de onda luego de cada evolución
+        norm_switch=true
+        if norm_switch
+            Norm𝛹ₓₜ=normalization_eigenstates_1D(𝛹ₓₜ,TrialSpace,dΩ)
+            𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
+            𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ*(1.0/Norm𝛹ₓₜ[i])),TrialSpace)
+        end
+        # calculamos los coeficientes de la superposición lineal
+        coeffvec₁₂=CoeffInit_1D(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    end
+    return 𝛹ₓₜ;
+end

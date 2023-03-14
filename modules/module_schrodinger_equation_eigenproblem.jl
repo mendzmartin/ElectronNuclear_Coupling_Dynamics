@@ -178,9 +178,16 @@ function eigenvalue_problem_functions(params;switch_potential = "QHO_1D")
     end
 end
 
+# Formas bilineales para problema de autovalores
+function bilineal_forms(p,q,r,dΩ)
+    a(u,v) = ∫(p*∇(v)⋅∇(u)+q*v*u)*dΩ;
+    b(u,v) = ∫(r*u*v)dΩ;
+    return a,b;
+end
+
 # Formas bilineales para problema de autovalores (parte Re e Im por separado)
 
-function bilineal_forms_ReImParts(p,q,r,dΩ;switch_potential="QHO_1D")
+function bilineal_forms_ReImParts(p,q,r,dΩ)
     a₁((u₁,v₁))=∫(p*(∇(v₁)⋅∇(u₁))+q*(v₁*u₁))dΩ;
     b₁((u₁,v₁))=∫(r*(v₁*u₁))dΩ;
 

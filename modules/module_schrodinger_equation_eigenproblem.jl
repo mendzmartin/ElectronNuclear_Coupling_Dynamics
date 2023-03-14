@@ -315,7 +315,8 @@ function TimeIndependet_Diff_Shannon_Entropy_1D(𝛹ₓ,TrialSpace,dΩ)
             S[i]=0.0;
             @printf("ERROR! ρₓᵢ=0, we can't compute Shannon entropy\n");
         else
-            S[i]=-sum(integrate(ρₓᵢ*ln_aprox(ρₓᵢ,20),dΩ))
+            S[i]=-sum(integrate(ρₓᵢ*(log∘ρₓᵢ),dΩ))
+            # S[i]=-sum(integrate(ρₓᵢ*ln_aprox(ρₓᵢ,20),dΩ))
             # S[i]=-sum(∫((ρₓᵢ*ln_aprox(ρₓᵢ,10))*dΩ))
         end
     end

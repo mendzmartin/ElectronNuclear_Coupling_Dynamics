@@ -169,8 +169,8 @@ function eigenvalue_problem_functions(params;switch_potential = "QHO_1D")
     elseif (switch_potential == "Electron_Nuclear_Potential_2D")
         # caso de potencial tipo interacción electron-nucleo en pozo nuclear
         @printf("Set Electron-Nuclear potential\n");
-        R,R₁,R₂,Rc,Rf=params;
-        pₕ_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/m+1.0/M);                                          # factor para energía cinética
+        R₁,R₂,Rc,Rf=params;
+        pₕ_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/m+1.0/M);     # factor para energía cinética
         qₕ_ENP_2D(x) = CoulombPotential(x[2],R₁)+CoulombPotential(x[2],R₂)+
             Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],x[2],Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
         rₕ_ENP_2D(x) = 1.0;
@@ -311,7 +311,6 @@ end
 
 function TimeIndependet_Diff_Shannon_Entropy_1D(𝛹ₓ,TrialSpace,dΩ)
     dim𝛹ₓ=length(𝛹ₓ)
-    𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[1],TrialSpace);
     S=zeros(Float64,dim𝛹ₓ)
     for i in 1:dim𝛹ₓ
         𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[i],TrialSpace);

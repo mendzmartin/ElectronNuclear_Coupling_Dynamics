@@ -96,6 +96,123 @@ function make_model(grid_type,params)
         model=GmshDiscreteModel(path*name*".msh")
     end
 
+    #= ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        Bloque de código agregado para crear un nuevo test que permita
+        utilizar elementos cuadriláteros y mallas estructuradas.
+       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
+    if grid_type == "simple_rectangle_v2"   # simple square Quad and triangle elements
+        
+        # parámetros de entrada
+        path,name,side_x,side_y,lc,numNodesHE,quad_state,structured_mesh,bumpFactor=params
+        # Asignamos número de nodos en los bordes horizontal y vertical
+        numNodesHE_hor,numNodesHE_ver = numNodesHE
+
+        if (quad_state == true)
+            gmsh.option.setNumber("Mesh.Algorithm", 5) # delquad
+            gmsh.option.setNumber("Mesh.RecombineAll", 1)
+        end
+        gmsh.model.add(name)
+
+        # first we build the rectangular boundary
+        lc_x = lc
+        lc_y = lc*side_y/side_x
+        # gmsh.model.geo.addPoint(x,y,z,meshSize=0.,tag=-1)
+        gmsh.model.occ.addPoint(0, 0, 0, lc_x, 1)               # 1 vertice inferior izq
+        gmsh.model.occ.addPoint(side_x, 0,  0, lc_x, 2)         # 2 vértice inferior der
+        gmsh.model.occ.addPoint(side_x, side_y, 0, lc_y, 3)     # 3 vértice superior der
+        gmsh.model.occ.addPoint(0, side_y, 0, lc_y, 4)          # 4 vértice superior izq
+
+        # make the square boundary
+        gmsh.model.occ.addLine(1, 2, 1) # 1 linea inferior
+        gmsh.model.occ.addLine(2, 3, 2) # 2 linea lateral der 
+        gmsh.model.occ.addLine(3, 4, 3) # 3 linea superior
+        gmsh.model.occ.addLine(4, 1, 4) # 4 linea lateral izq
+
+        gmsh.model.occ.addCurveLoop([1, 2, 3, 4], 10) #the rectangle
+        gmsh.model.occ.synchronize()
+
+        # make the surface
+        gmsh.model.occ.addPlaneSurface([10], 100) #the surface
+        gmsh.model.occ.synchronize()
+        
+        type_structured_mesh="AlternateLeft";
+
+        if (structured_mesh == true)
+            #= ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            The `setTransfiniteCurve()' meshing constraints explicitly specifies the
+            location of the nodes on the curve.
+            ++++++++++++++++++++++++++++++++++++++++++++++++++++++ =# 
+            # Creamos curvas de interpolación inferior y superior
+            # bumpFactor = 0.20 (default)
+            gmsh.model.mesh.setTransfiniteCurve(1, numNodesHE_hor, "Bump", bumpFactor)
+            gmsh.model.mesh.setTransfiniteCurve(3, numNodesHE_hor, "Bump", bumpFactor)
+            # Creamos curvas de interpolación lateral izquierda y derecha
+            gmsh.model.mesh.setTransfiniteCurve(2, numNodesHE_ver, "Bump", bumpFactor)
+            gmsh.model.mesh.setTransfiniteCurve(4, numNodesHE_ver, "Bump", bumpFactor)
+            
+            #= ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            The `setTransfiniteSurface()' meshing constraint uses a transfinite
+            interpolation algorithm in the parametric plane of the surface to connect
+            the nodes on the boundary using a structured grid. If the surface has more
+            than 4 corner points, the corners of the transfinite interpolation have to
+            be specified by hand:
+            The way triangles are generated can be controlled by specifying "Left",
+            "Right" or "Alternate" in `setTransfiniteSurface()' command.
+            ++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
+            # creamos malla estructurada en la cara 2D
+            if (type_structured_mesh == "Default")
+                gmsh.model.mesh.setTransfiniteSurface(100) # for structured mesh
+            elseif (type_structured_mesh == "Left" && quad_state == false)
+                gmsh.model.mesh.setTransfiniteSurface(100,"Left")
+            elseif (type_structured_mesh == "Right" && quad_state == false)
+                gmsh.model.mesh.setTransfiniteSurface(100,"Right")
+            elseif (type_structured_mesh == "Alternate" && quad_state == false)
+                gmsh.model.mesh.setTransfiniteSurface(100,"Alternate")
+            elseif (type_structured_mesh == "AlternateLeft" && quad_state == false)
+                gmsh.model.mesh.setTransfiniteSurface(100,"AlternateLeft")
+            elseif (type_structured_mesh == "AlternateRight" && quad_state == false)
+                gmsh.model.mesh.setTransfiniteSurface(100,"AlternateRight")
+            end
+        end
+
+        if (quad_state == true)
+            println("Choose FE-quadrilaterals");
+            gmsh.model.mesh.setRecombine(2, 100) # for 2D quadrilaterals
+        else
+            println("Choose FE-triangles (default)");
+        end
+
+        # creamos grupos para definir condiciones de bordes
+        # gmsh.model.addPhysicalGroup(dimensión,elementos,tag)
+
+        gmsh.model.geo.addPhysicalGroup(0, [1, 2, 3, 4], 12 )   # grupo formado por las 4 lineas del borde
+        gmsh.model.setPhysicalName(0, 12, "ext_vertices")       # le damos nombre al grupo (dim = 0)
+        gmsh.model.geo.synchronize()                            # sincronizamos para que sea visible
+
+        gmsh.model.addPhysicalGroup(1, [1, 2, 3, 4], 11 )       # grupo formado por las 4 lineas del borde
+        gmsh.model.setPhysicalName(1, 11, "ext")                # le damos nombre al grupo (dim = 1)
+        gmsh.model.occ.synchronize()                            # sincronizamos para que sea visible
+
+        gmsh.model.addPhysicalGroup(2, [100], 101)              # grupo formado por cara 2D
+        gmsh.model.setPhysicalName(2, 101, "surface")           # sincronizamos para que sea visible
+        gmsh.model.occ.synchronize()                            # sincronizamos para que sea visible
+
+        # generamos mesh 2D
+        gmsh.model.mesh.generate(2)
+        gmsh.write(path*name*".msh")
+
+        # # esto abre una consola interactiva con gmsh
+        # if !("-nopopup" in ARGS)
+        #     gmsh.fltk.run()
+        # end
+
+        # finalizamos armado de grilla
+        gmsh.finalize()
+
+        # guardamos mesh en una variable
+        model = GmshDiscreteModel(path*name*".msh")
+    end
+
     return model;
 end
 

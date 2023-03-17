@@ -322,8 +322,6 @@ function TimeIndependet_Diff_Shannon_Entropy_1D(𝛹ₓ,TrialSpace,dΩ)
             @printf("ERROR! ρₓᵢ=0, we can't compute Shannon entropy\n");
         else
             S[i]=-sum(integrate(ρₓᵢ*(log∘ρₓᵢ),dΩ))
-            # S[i]=-sum(integrate(ρₓᵢ*ln_aprox(ρₓᵢ,20),dΩ))
-            # S[i]=-sum(∫((ρₓᵢ*ln_aprox(ρₓᵢ,10))*dΩ))
         end
     end
     return S;
@@ -340,6 +338,20 @@ function heaviside(x)
 
 function interval(x,x₁,x₂,A)
    A*(heaviside(x-x₁)-heaviside(x-x₂))
+end
+
+function kronecker_deltax_Gridap(x,x₀)
+    n=1000;
+    if (x[1]==x₀)
+        return n*(1.0/sqrt(π))*exp(-pow(x[1]*n,2));
+    else
+        return 0.0;
+    end
+end
+
+function kronecker_deltax_Gridap_v2(x,x₀,δnorm)
+    n=100;
+    return n*(1.0/sqrt(π))*exp(-pow((x[1]-x₀)*n,2))*(1.0/δnorm)
 end
 
 CoulombPotential(r,r₀)=1.0/abs(r₀-r);

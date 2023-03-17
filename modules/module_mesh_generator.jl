@@ -128,11 +128,29 @@ function make_model(grid_type,params)
         gmsh.model.occ.addLine(3, 4, 3) # 3 linea superior
         gmsh.model.occ.addLine(4, 1, 4) # 4 linea lateral izq
 
-        gmsh.model.occ.addCurveLoop([1, 2, 3, 4], 10) #the rectangle
+        gmsh.model.occ.addCurveLoop([1,2,3,4], 10) #the rectangle
+        gmsh.model.occ.synchronize()
+
+        # creamos puntos internos
+        lc_f=lc/4.0;
+        x₁=side_x/3;x₂=2*side_x/3;
+        y₁=side_y/3;y₂=2*side_y/3;
+        gmsh.model.occ.addPoint(x₁,y₁,0,lc_f,5)          # 5 vertice interno inferior izq
+        gmsh.model.occ.addPoint(x₂,y₁,0,lc_f,6)     # 5 vertice interno inferior der
+        gmsh.model.occ.addPoint(x₂,y₂,0,lc_f,7)     # 5 vertice interno superior der
+        gmsh.model.occ.addPoint(x₁,y₂,0,lc_f,8)     # 5 vertice interno superior izq
+        # make internal rectangle
+        gmsh.model.occ.addLine(5,6,5) # 1 linea interna inferior
+        gmsh.model.occ.addLine(6,7,6) # 2 linea interna lateral der
+        gmsh.model.occ.addLine(7,8,7) # 4 linea interna superior 
+        gmsh.model.occ.addLine(8,5,8) # 4 linea interna lateral izq    
+        # make internal loop
+        gmsh.model.occ.addCurveLoop([5,6,7,8],11) # the internal rectangle
         gmsh.model.occ.synchronize()
 
         # make the surface
-        gmsh.model.occ.addPlaneSurface([10], 100) #the surface
+        gmsh.model.occ.addPlaneSurface([10,11], 100) #the surface
+        # gmsh.model.occ.addPlaneSurface([10], 100) #the surface
         gmsh.model.occ.synchronize()
         
         type_structured_mesh="AlternateLeft";
@@ -185,13 +203,21 @@ function make_model(grid_type,params)
         # creamos grupos para definir condiciones de bordes
         # gmsh.model.addPhysicalGroup(dimensión,elementos,tag)
 
-        gmsh.model.geo.addPhysicalGroup(0, [1, 2, 3, 4], 12 )   # grupo formado por las 4 lineas del borde
-        gmsh.model.setPhysicalName(0, 12, "ext_vertices")       # le damos nombre al grupo (dim = 0)
+        gmsh.model.geo.addPhysicalGroup(0,[1,2,3,4],12,"ext_vertices")   # grupo formado por las 4 lineas del borde
+        # gmsh.model.setPhysicalName(0, 12, "ext_vertices")       # le damos nombre al grupo (dim = 0)
         gmsh.model.geo.synchronize()                            # sincronizamos para que sea visible
 
-        gmsh.model.addPhysicalGroup(1, [1, 2, 3, 4], 11 )       # grupo formado por las 4 lineas del borde
+        gmsh.model.addPhysicalGroup(1, [1,2,3,4], 11 )       # grupo formado por las 4 lineas del borde
         gmsh.model.setPhysicalName(1, 11, "ext")                # le damos nombre al grupo (dim = 1)
-        gmsh.model.occ.synchronize()                            # sincronizamos para que sea visible
+        gmsh.model.occ.synchronize()                            # sincronizamos para que sea visible   
+
+        gmsh.model.addPhysicalGroup(1,[5,6,7,8],14) # grupo para el loop interno
+        gmsh.model.setPhysicalName(1,14,"int_loop")
+        gmsh.model.occ.synchronize()
+
+        gmsh.model.addPhysicalGroup(0,[5,6,7,8],13)  # grupo formado por los dos puntos internos
+        gmsh.model.setPhysicalName(0,13,"int_points")
+        gmsh.model.occ.synchronize()
 
         gmsh.model.addPhysicalGroup(2, [100], 101)              # grupo formado por cara 2D
         gmsh.model.setPhysicalName(2, 101, "surface")           # sincronizamos para que sea visible

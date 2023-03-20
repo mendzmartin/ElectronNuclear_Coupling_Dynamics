@@ -159,7 +159,7 @@ function eigenvalue_problem_functions(params;switch_potential = "QHO_1D")
         return pₕ_FWP,qₕ_FWP,rₕ_FWP;
     elseif (switch_potential == "Electron_Nuclear_Potential_1D")
         # caso de potencial tipo interacción electron-nucleo en pozo nuclear
-        @printf("Set Electron-Nuclear potential with fixed R\n");
+        # @printf("Set Electron-Nuclear potential with fixed R\n");
         R,R₁,R₂,Rc,Rf=params;
         pₕ_ENP_1D(x) = 0.5*(ħ*ħ)*(1.0/m);                                          # factor para energía cinética
         qₕ_ENP_1D(x) = CoulombPotential(R,R₁)+CoulombPotential(R,R₂)+
@@ -212,17 +212,27 @@ end
     función para obtener los puntos discretos de la grilla (valuados)
     y un vector pts que almacena dichos puntos
 =#
-function space_coord(dom,Δx)
-    x=[dom[1]+abs(dom[2]-dom[1])*Δx*i for i in 1:convert(Int,1.0/Δx)];
-    pts=[Point(x[i]) for i in 1:convert(Int,1.0/Δx)];
+function space_coord_1D(dom,Δx)
+    nx=(round(Int,1.0/Δx)+1); # cantidad de puntos en dirección x
+    x=[dom[1]+abs(dom[2]-dom[1])*Δx*(i-1) for i in 1:nx];
+    pts=[Point(x[i]) for i in 1:nx];
     return x,pts;
+end
+
+function space_coord_2D(dom,Δx,Δy)
+    nx=round(Int,abs(dom[2]-dom[1])/Δx)+1; # cantidad de puntos en dirección x
+    ny=round(Int,abs(dom[4]-dom[3])/Δy)+1; # cantidad de puntos en dirección y
+    x=[dom[1]+Δx*(i-1) for i in 1:nx];
+    y=[dom[3]+Δy*(i-1) for i in 1:ny];
+    pts=[Point(x[i],y[j]) for i in 1:nx for j in 1:ny];
+    return x,y,pts;
 end
 
 #=
     función para calcular normalización de autoestados de
     un hamiltoniano 1D
 =#
-function normalization_eigenstates_1D(ϕ,TrialSpace,dΩ)
+function normalization_eigenstates(ϕ,TrialSpace,dΩ)
     nom_vec=zeros(Float64,length(ϕ))
     for i in 1:length(ϕ)
         ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
@@ -234,7 +244,7 @@ end
     función para calcular normalización de autoestados de
     un hamiltoniano 2D
 =#
-function normalization_eigenstates_2D(ϕ,TrialSpace,dΩ)
+function normalization_eigenstates_multifield(ϕ,TrialSpace,dΩ)
     nom_vec₁₂=zeros(Float64,length(ϕ))
     for i in 1:length(ϕ)
         ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
@@ -249,7 +259,7 @@ end
     función para chequear ortogonalidad de autoestados de
     un hamiltoniano 2D
 =#
-function OrthoCheck_2D(ϕ,TrialSpace,dΩ)
+function OrthoCheck_multifield(ϕ,TrialSpace,dΩ)
     nev=length(ϕ)
     OrthoVector=zeros(Float64,nev^2-nev);
     index=1
@@ -270,7 +280,7 @@ end
 #=
     función para calcular la populación de estados
 =#
-function Populations_2D(𝛹ₓₜ,TrialSpace,dΩ)
+function Populations_multifield(𝛹ₓₜ,TrialSpace,dΩ)
     dimₜ=length(𝛹ₓₜ)
     p¹ₜ=zeros(Float64,dimₜ);
     p²ₜ=zeros(Float64,dimₜ);
@@ -309,7 +319,7 @@ function pow(x,n)
     return result
 end
 
-function TimeIndependet_Diff_Shannon_Entropy_1D(𝛹ₓ,TrialSpace,dΩ)
+function TimeIndependet_Diff_Shannon_Entropy(𝛹ₓ,TrialSpace,dΩ)
     dim𝛹ₓ=length(𝛹ₓ)
     S=zeros(Float64,dim𝛹ₓ)
     for i in 1:dim𝛹ₓ
@@ -368,7 +378,7 @@ Aprox_Coulomb_Potential(r,r₀,R)=-erf(abs(r₀-r)*(1.0/R))*CoulombPotential(r,r
 #=
     Function to find initial state descomposition coefficients
 =#
-function CoeffInit_1D(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+function CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
     dim=length(ϕₙ)
     InnerProdEigenvecs=zeros(ComplexF64,dim,dim);   # matriz global de inversas de productos internos entre autoestados
     InnerProdBC=zeros(ComplexF64,dim);              # vector global de productos internos entre autoestados y estado inicial
@@ -393,11 +403,11 @@ end
 #=
     Function to evolve quantum system
 =#
-function evolution_schrodinger_1D(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
+function evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
     dim_time=length(time_vec)
     dim_eigenval=length(ϵₙ)
     # calculamos los coeficientes de la superposición lineal
-    coeffvec₁₂=CoeffInit_1D(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
     𝛹ₓₜ=Vector{CellField}(undef,dim_time);
     # inicializamos en cero el vector de onda
     ϕ₁=interpolate_everywhere(ϕₙ[1],TrialSpace);
@@ -414,12 +424,12 @@ function evolution_schrodinger_1D(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec
         # normalizamos la función de onda luego de cada evolución
         norm_switch=true
         if norm_switch
-            Norm𝛹ₓₜ=normalization_eigenstates_1D(𝛹ₓₜ,TrialSpace,dΩ)
+            Norm𝛹ₓₜ=normalization_eigenstates(𝛹ₓₜ,TrialSpace,dΩ)
             𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
             𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ*(1.0/Norm𝛹ₓₜ[i])),TrialSpace)
         end
         # calculamos los coeficientes de la superposición lineal
-        coeffvec₁₂=CoeffInit_1D(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+        coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
     end
     return 𝛹ₓₜ;
 end

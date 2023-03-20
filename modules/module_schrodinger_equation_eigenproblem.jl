@@ -359,9 +359,10 @@ function kronecker_deltax_Gridap(x,x₀)
     end
 end
 
-function kronecker_deltax_Gridap_v2(x,x₀,δnorm)
+# https://en.wikipedia.org/wiki/Dirac_delta_function
+function kronecker_deltax_Gridap_v2(x,x₀,δnorm,component)
     n=100;
-    return n*(1.0/sqrt(π))*exp(-pow((x[1]-x₀)*n,2))*(1.0/δnorm)
+    return n*(1.0/sqrt(π))*exp(-pow((x[component]-x₀)*n,2))*(1.0/δnorm)
 end
 
 CoulombPotential(r,r₀)=1.0/abs(r₀-r);
@@ -386,9 +387,9 @@ function CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
     for i in 1:dim
         ϕᵢ=interpolate_everywhere(ϕₙ[i],TrialSpace);
         InnerProdBC[i]=sum(∫(ϕᵢ'*𝛹ₓ₀)*dΩ)
-        for j in i:dim
+        for j in 1:i
             ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
-            InnerProdEigenvecs[i,j]=(sum(∫(ϕᵢ'*ϕⱼ)*dΩ)+sum(∫(ϕᵢ'*ϕⱼ)*dΩ))
+            InnerProdEigenvecs[i,j]=sum(∫(ϕᵢ'*ϕⱼ)*dΩ)
             if (i≠j) # optimización por simetría
                 InnerProdEigenvecs[j,i]=conj(InnerProdEigenvecs[i,j])
             end
@@ -405,7 +406,6 @@ end
 =#
 function evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
     dim_time=length(time_vec)
-    dim_eigenval=length(ϵₙ)
     # calculamos los coeficientes de la superposición lineal
     coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
     𝛹ₓₜ=Vector{CellField}(undef,dim_time);
@@ -415,7 +415,7 @@ function evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
         𝛹ₓₜ[i]=interpolate_everywhere(0.0*ϕ₁,TrialSpace)
     end
     for i in 1:dim_time
-        for j in 1:dim_eigenval
+        for j in 1:length(ϵₙ)
             𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
             ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
             factor=coeffvec₁₂[j]*exp(-im*(1.0/ħ)*ϵₙ[j]*time_vec[i])
@@ -428,8 +428,8 @@ function evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
             𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
             𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ*(1.0/Norm𝛹ₓₜ[i])),TrialSpace)
         end
-        # calculamos los coeficientes de la superposición lineal
-        coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+        # recalculamos los coeficientes de la superposición lineal
+        coeffvec₁₂=CoeffInit(𝛹ₓₜ[i],ϕₙ,TrialSpace,dΩ)
     end
     return 𝛹ₓₜ;
 end

@@ -213,8 +213,8 @@ end
     y un vector pts que almacena dichos puntos
 =#
 function space_coord_1D(dom,Δx)
-    nx=(round(Int,1.0/Δx)+1); # cantidad de puntos en dirección x
-    x=[dom[1]+abs(dom[2]-dom[1])*Δx*(i-1) for i in 1:nx];
+    nx=round(Int,abs(dom[2]-dom[1])/Δx)+1; # cantidad de puntos en dirección x
+    x=[dom[1]+Δx*(i-1) for i in 1:nx];
     pts=[Point(x[i]) for i in 1:nx];
     return x,pts;
 end

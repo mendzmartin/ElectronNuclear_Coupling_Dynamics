@@ -476,3 +476,31 @@ function evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
     end
     return 𝛹ₓₜ;
 end
+
+function evolution_schrodinger_v2(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
+    dim_time=length(time_vec)
+    # calculamos los coeficientes de la superposición lineal
+    coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    𝛹ₓₜ=Vector{CellField}(undef,dim_time);
+    # inicializamos en cero el vector de onda
+    ϕ₁=interpolate_everywhere(ϕₙ[1],TrialSpace);
+    for i in 1:dim_time
+        𝛹ₓₜ[i]=interpolate_everywhere(0.0*ϕ₁,TrialSpace)
+    end
+    for i in 1:dim_time
+        for j in 1:length(ϵₙ)
+            𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
+            ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
+            factor=coeffvec₁₂[j]*exp(-im*(1.0/ħ)*real(ϵₙ[j])*time_vec[i])
+            𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ+factor*ϕⱼ),TrialSpace)
+        end
+        # normalizamos la función de onda luego de cada evolución
+        norm_switch=false
+        if norm_switch
+            𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace);
+            Norm𝛹ₓₜⁱ=norm_L2(𝛹ₓₜ[i],dΩ)
+            𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ*(1.0/Norm𝛹ₓₜⁱ)),TrialSpace)
+        end
+    end
+    return 𝛹ₓₜ;
+end

@@ -278,7 +278,6 @@ function OrthoCheck_multifield(ϕ,TrialSpace,dΩ)
     return OrthoVector;
 end
 
-# optimizar sólo calculo triangular superior
 function OrthoCheck(ϕ,TrialSpace,dΩ)
     nev=length(ϕ)
     OrthoVector=zeros(Float64,nev^2-nev);
@@ -295,6 +294,7 @@ function OrthoCheck(ϕ,TrialSpace,dΩ)
     end
     return OrthoVector;
 end
+
 #=
     función para calcular la populación de estados
 =#
@@ -396,40 +396,52 @@ Aprox_Coulomb_Potential(r,r₀,R)=-erf(abs(r₀-r)*(1.0/R))*CoulombPotential(r,r
 
 #=
     Function to find initial state descomposition coefficients
+        when base functions are not orthogonal each other
 =#
-# function CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
-#     dim=length(ϕₙ)
-#     InnerProdEigenvecs=zeros(ComplexF64,dim,dim);   # matriz global de inversas de productos internos entre autoestados
-#     InnerProdBC=zeros(ComplexF64,dim);              # vector global de productos internos entre autoestados y estado inicial
-#     # primer submatriz n✖n y subvector n✖1
-#     for i in 1:dim
-#         ϕᵢ=interpolate_everywhere(ϕₙ[i],TrialSpace);
-#         InnerProdBC[i]=sum(∫(ϕᵢ'*𝛹ₓ₀)*dΩ)
-#         for j in 1:i
-#             ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
-#             InnerProdEigenvecs[i,j]=sum(∫(ϕᵢ'*ϕⱼ)*dΩ)
-#             if (i≠j) # optimización por simetría
-#                 InnerProdEigenvecs[j,i]=conj(InnerProdEigenvecs[i,j])
-#             end
-#         end
-#     end
-#     # x=A\b
-#     coeffvec₁₂=InnerProdEigenvecs\InnerProdBC;
-#     return coeffvec₁₂;
-# end
-
-function CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+function CoeffInit_no_orthogonal(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
     dim=length(ϕₙ)
+    InnerProdEigenvecs=zeros(ComplexF64,dim,dim);   # matriz global de inversas de productos internos entre autoestados
     InnerProdBC=zeros(ComplexF64,dim);              # vector global de productos internos entre autoestados y estado inicial
     # primer submatriz n✖n y subvector n✖1
     for i in 1:dim
         ϕᵢ=interpolate_everywhere(ϕₙ[i],TrialSpace);
         InnerProdBC[i]=sum(∫(ϕᵢ'*𝛹ₓ₀)*dΩ)
+        for j in 1:i
+            ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
+            InnerProdEigenvecs[i,j]=sum(∫(ϕᵢ'*ϕⱼ)*dΩ)
+            if (i≠j) # optimización por simetría
+                InnerProdEigenvecs[j,i]=conj(InnerProdEigenvecs[i,j])
+            end
+        end
     end
     # x=A\b
-    return InnerProdBC;
+    coeffvec₁₂=InnerProdEigenvecs\InnerProdBC;
+    return coeffvec₁₂;
 end
 
+#=
+    Function to find initial state descomposition coefficients
+        when base functions are orthogonal each other
+=#
+function CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    dim=length(ϕₙ)
+    coeffvec₁₂=zeros(ComplexF64,dim); # vector global de productos internos entre autoestados y estado inicial
+    for i in 1:dim
+        ϕᵢ=interpolate_everywhere(ϕₙ[i],TrialSpace);
+        coeffvec₁₂[i]=sum(∫(ϕᵢ'*𝛹ₓ₀)*dΩ)
+    end
+    return coeffvec₁₂;
+end
+
+function CheckConvergence(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    sum_coeff=zeros(Float64,length(ϕₙ));
+    sum_coeff[1]=real((coeffvec₁₂[1])'*coeffvec₁₂[1])
+    for i in 2:length(ϕₙ)
+        sum_coeff[i]=sum_coeff[i-1]+real((coeffvec₁₂[i])'*coeffvec₁₂[i])
+    end
+    return sum_coeff;
+end
 
 #=
     Function to evolve quantum system
@@ -444,28 +456,23 @@ function evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
     for i in 1:dim_time
         𝛹ₓₜ[i]=interpolate_everywhere(0.0*ϕ₁,TrialSpace)
     end
-    result=0.0
     for i in 1:dim_time
         for j in 1:length(ϵₙ)
             𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
             ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
             factor=coeffvec₁₂[j]*exp(-im*(1.0/ħ)*real(ϵₙ[j])*time_vec[i])
-            if i==1
-                result=result+real(factor'*factor)
-                println(result);
-            end
             𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ+factor*ϕⱼ),TrialSpace)
         end
-        break
         # normalizamos la función de onda luego de cada evolución
         norm_switch=true
         if norm_switch
-            Norm𝛹ₓₜ=normalization_eigenstates(𝛹ₓₜ,TrialSpace,dΩ)
-            𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
-            𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ*(1.0/Norm𝛹ₓₜ[i])),TrialSpace)
+            𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace);
+            Norm𝛹ₓₜⁱ=norm_L2(𝛹ₓₜ[i],dΩ)
+            𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ*(1.0/Norm𝛹ₓₜⁱ)),TrialSpace)
         end
         # recalculamos los coeficientes de la superposición lineal
         coeffvec₁₂=CoeffInit(𝛹ₓₜ[i],ϕₙ,TrialSpace,dΩ)
+        println("run step = $(i)/$(dim_time)");
     end
     return 𝛹ₓₜ;
 end

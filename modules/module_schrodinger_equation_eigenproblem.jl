@@ -80,7 +80,7 @@ using Printf; # para imprimir salidas con formatos
 
 install_packages=false;
 if install_packages
-    import Pkg
+    import Pkg;
     Pkg.add("LinearAlgebra");
     Pkg.add("SparseArrays");
     Pkg.add("LinearAlgebra");
@@ -90,6 +90,15 @@ using LinearAlgebra;
 using SparseArrays;
 using SuiteSparse;
 using Arpack;
+
+install_packages=false;
+if install_packages
+    import Pkg;
+    Pkg.add("DataInterpolations");
+    Pkg.add("BenchmarkTools");
+end
+using DataInterpolations;   # interpolation function package
+using BenchmarkTools;       # benchmarks and performance package
 
 #= +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++ Importamos módulos
@@ -103,11 +112,12 @@ include(path_modules*"module_mesh_generator.jl");   # módulo para construir gri
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
 # declaramos parámetros constantes (utilizando sistema atómico de unidades)
-const m=1.0;        # electron mass
-const M=200.0*m;    # proton mass
-const ħ=1.0;        # Planck constant
+const m=1.0;            # electron mass
+const M=2000.0*m;       # proton mass
+const ħ=1.0;            # Planck constant
+const γ=sqrt(M*(1.0/m));    # scaling factor
 
-α=im*ħ*0.5*(1.0/m);               # factor multiplicativo energía cinética
+α=im*ħ*0.5*(1.0/m);                  # factor multiplicativo energía cinética
 αconst(ω)=-im*0.5*m*(ω*ω)*(1.0/ħ);   # factor multiplicativo potencial armónico
 
 #= +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -170,9 +180,9 @@ function eigenvalue_problem_functions(params;switch_potential = "QHO_1D")
         # caso de potencial tipo interacción electron-nucleo en pozo nuclear
         @printf("Set Electron-Nuclear potential\n");
         R₁,R₂,Rc,Rf=params;
-        pₕ_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/m+1.0/M);     # factor para energía cinética
-        qₕ_ENP_2D(x) = CoulombPotential(x[2],R₁)+CoulombPotential(x[2],R₂)+
-            Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],x[2],Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
+        pₕ_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/m);     # factor para energía cinética
+        qₕ_ENP_2D(x) = CoulombPotential(x[2]*(1.0/γ),R₁)+CoulombPotential(x[2]*(1.0/γ),R₂)+
+            Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],x[2]*(1.0/γ),Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
         rₕ_ENP_2D(x) = 1.0;
         return pₕ_ENP_2D,qₕ_ENP_2D,rₕ_ENP_2D;
     end

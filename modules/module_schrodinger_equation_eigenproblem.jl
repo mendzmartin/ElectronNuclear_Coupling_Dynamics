@@ -97,8 +97,8 @@ if install_packages
     Pkg.add("DataInterpolations");
     Pkg.add("BenchmarkTools");
 end
-using DataInterpolations;   # interpolation function package
-using BenchmarkTools;       # benchmarks and performance package
+using DataInterpolations;   # interpolation function package (https://github.com/PumasAI/DataInterpolations.jl)
+using BenchmarkTools;       # benchmarks and performance package (https://juliaci.github.io/BenchmarkTools.jl/stable/)
 
 #= +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++ Importamos módulos
@@ -190,19 +190,19 @@ end
 
 # Formas bilineales para problema de autovalores
 function bilineal_forms(p,q,r,dΩ)
-    a(u,v) = ∫(p*∇(v)⋅∇(u)+q*v*u)*dΩ;
-    b(u,v) = ∫(r*u*v)dΩ;
+    a(u,v) = ∫(p*(∇(v)⋅∇(u))+q*v*u)*dΩ;
+    b(u,v) = ∫(r*u*v)*dΩ;
     return a,b;
 end
 
 # Formas bilineales para problema de autovalores (parte Re e Im por separado)
 
 function bilineal_forms_ReImParts(p,q,r,dΩ)
-    a₁((u₁,v₁))=∫(p*(∇(v₁)⋅∇(u₁))+q*(v₁*u₁))dΩ;
-    b₁((u₁,v₁))=∫(r*(v₁*u₁))dΩ;
+    a₁((u₁,v₁))=∫(p*(∇(v₁)⋅∇(u₁))+q*(v₁*u₁))*dΩ;
+    b₁((u₁,v₁))=∫(r*(v₁*u₁))*dΩ;
 
-    a₂((u₂,v₂))=∫(p*(∇(v₂)⋅∇(u₂))+q*(v₂*u₂))dΩ;
-    b₂((u₂,v₂))=∫(r*(v₂*u₂))dΩ;
+    a₂((u₂,v₂))=∫(p*(∇(v₂)⋅∇(u₂))+q*(v₂*u₂))*dΩ;
+    b₂((u₂,v₂))=∫(r*(v₂*u₂))*dΩ;
 
     a((u₁,u₂),(v₁,v₂)) = a₁((u₁,v₁))+a₂((u₂,v₂))
     b((u₁,u₂),(v₁,v₂)) = b₁((u₁,v₁))+b₂((u₂,v₂))
@@ -305,6 +305,21 @@ function OrthoCheck(ϕ,TrialSpace,dΩ)
     return OrthoVector;
 end
 
+function OrthoCheck_v2(ϕ,TrialSpace,dΩ)
+    nev=length(ϕ)
+    OrthoVector=zeros(Float64,round(Int,(nev^2-nev)/2));
+    index=1
+    for i in 2:nev
+        ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
+        for j in 1:(i-1)
+            ϕⱼ=interpolate_everywhere(ϕ[j],TrialSpace);
+            OrthoVector[index]=abs(sum(∫(ϕⱼ'*ϕᵢ)*dΩ))
+            index+=1
+        end
+    end
+    return OrthoVector;
+end
+
 #=
     función para calcular la populación de estados
 =#
@@ -355,6 +370,7 @@ function TimeIndependet_Diff_Shannon_Entropy(𝛹ₓ,TrialSpace,dΩ)
         𝛹ₓᵢ=𝛹ₓᵢ/norm_L2(𝛹ₓᵢ,dΩ);
 
         ρₓᵢ=real(𝛹ₓᵢ'*𝛹ₓᵢ)
+        
         if ρₓᵢ==0.0
             S[i]=0.0;
             @printf("ERROR! ρₓᵢ=0, we can't compute Shannon entropy\n");
@@ -389,8 +405,9 @@ end
 
 # https://en.wikipedia.org/wiki/Dirac_delta_function
 function kronecker_deltax_Gridap_v2(x,x₀,δnorm,component)
-    n=100;
-    return n*(1.0/sqrt(π))*exp(-pow((x[component]-x₀)*n,2))*(1.0/δnorm)
+    # b=1e-1;
+    b=1.0;
+    return (1.0/(abs(b)*sqrt(π)))*exp(-pow((x[component]-x₀)*(1.0/b),2))*(1.0/δnorm)
 end
 
 CoulombPotential(r,r₀)=1.0/abs(r₀-r);
@@ -505,7 +522,7 @@ function evolution_schrodinger_v2(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec
             𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ+factor*ϕⱼ),TrialSpace)
         end
         # normalizamos la función de onda luego de cada evolución
-        norm_switch=false
+        norm_switch=true
         if norm_switch
             𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace);
             Norm𝛹ₓₜⁱ=norm_L2(𝛹ₓₜ[i],dΩ)

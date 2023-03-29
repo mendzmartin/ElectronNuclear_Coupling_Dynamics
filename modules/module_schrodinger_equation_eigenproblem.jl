@@ -115,7 +115,13 @@ include(path_modules*"module_mesh_generator.jl");   # módulo para construir gri
 const m=1.0;            # electron mass
 const M=2000.0*m;       # proton mass
 const ħ=1.0;            # Planck constant
-const γ=sqrt(M*(1.0/m));    # scaling factor
+const γ=sqrt(M*(1.0/m));    # scaling factor (R=γχ)
+
+# set unit convertion constant
+const Bohr_radius_meter=5.29177210903e−11;                        # [m]
+const Angstrom_to_meter=1e−10;                                    # [m/Å]
+const Angstrom_to_au=Angstrom_to_meter*(1.0/Bohr_radius_meter);   # [au/Å]
+const Femtoseconds_to_au=(1.0/0.0218884);                         # [au/fs]
 
 α=im*ħ*0.5*(1.0/m);                  # factor multiplicativo energía cinética
 αconst(ω)=-im*0.5*m*(ω*ω)*(1.0/ħ);   # factor multiplicativo potencial armónico
@@ -405,7 +411,7 @@ end
 
 # https://en.wikipedia.org/wiki/Dirac_delta_function
 function kronecker_deltax_Gridap_v2(x,x₀,δnorm,component)
-    # b=1e-1;
+    # b=1e-5;
     b=1.0;
     return (1.0/(abs(b)*sqrt(π)))*exp(-pow((x[component]-x₀)*(1.0/b),2))*(1.0/δnorm)
 end

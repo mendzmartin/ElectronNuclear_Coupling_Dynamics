@@ -411,9 +411,21 @@ end
 
 # https://en.wikipedia.org/wiki/Dirac_delta_function
 function kronecker_deltax_Gridap_v2(x,x₀,δnorm,component)
-    # b=1e-5;
+    a=10000;
+    # b=1e-1;
     b=1.0;
-    return (1.0/(abs(b)*sqrt(π)))*exp(-pow((x[component]-x₀)*(1.0/b),2))*(1.0/δnorm)
+    return (1.0/(abs(b)*sqrt(π)))*exp(-a*pow((x[component]-x₀)*(1.0/b),2))*(1.0/δnorm)
+end
+
+function kronecker_deltax_Gridap_v3(x,x₀,δnorm,component,Δx)
+    q=0.5
+    if (abs(x[component]-x₀)≤(q*Δx))
+        # f=((x[component]-(x₀-q*Δx))-(x[component]-(x₀+q*Δx)))*(1.0/δnorm)
+        f=(2*q*Δx)*(1.0/δnorm)
+    else
+        f=0.0
+    end
+    return f
 end
 
 CoulombPotential(r,r₀)=1.0/abs(r₀-r);

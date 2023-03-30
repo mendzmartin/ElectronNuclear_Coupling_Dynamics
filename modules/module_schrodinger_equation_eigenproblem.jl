@@ -400,32 +400,20 @@ function interval(x,x₁,x₂,A)
    A*(heaviside(x-x₁)-heaviside(x-x₂))
 end
 
-function kronecker_deltax_Gridap(x,x₀)
-    n=1000;
-    if (x[1]==x₀)
-        return n*(1.0/sqrt(π))*exp(-pow(x[1]*n,2));
-    else
-        return 0.0;
+function AproxDiracDeltaFunction(x,params;TypeFunction="StepFunction")
+    if (TypeFunction=="BumpFunction")
+        # https://en.wikipedia.org/wiki/Dirac_delta_function
+        # https://en.wikipedia.org/wiki/Bump_function
+        x₀,δnorm,component=params
+        a=10000;b=1.0;
+        δ=(1.0/(abs(b)*sqrt(π)))*exp(-a*pow((x[component]-x₀)*(1.0/b),2))*(1.0/δnorm)
+    elseif (TypeFunction=="StepFunction")
+        x₀,δnorm,component,Δx=params
+        q=0.5;
+        (abs(x[component]-x₀)≤(q*Δx)) ? δ=(2*q*Δx)*(1.0/δnorm) : δ=0.0
+        # δ=((x[component]-(x₀-q*Δx))-(x[component]-(x₀+q*Δx)))*(1.0/δnorm)
     end
-end
-
-# https://en.wikipedia.org/wiki/Dirac_delta_function
-function kronecker_deltax_Gridap_v2(x,x₀,δnorm,component)
-    a=10000;
-    # b=1e-1;
-    b=1.0;
-    return (1.0/(abs(b)*sqrt(π)))*exp(-a*pow((x[component]-x₀)*(1.0/b),2))*(1.0/δnorm)
-end
-
-function kronecker_deltax_Gridap_v3(x,x₀,δnorm,component,Δx)
-    q=0.5
-    if (abs(x[component]-x₀)≤(q*Δx))
-        # f=((x[component]-(x₀-q*Δx))-(x[component]-(x₀+q*Δx)))*(1.0/δnorm)
-        f=(2*q*Δx)*(1.0/δnorm)
-    else
-        f=0.0
-    end
-    return f
+    return δ
 end
 
 CoulombPotential(r,r₀)=1.0/abs(r₀-r);

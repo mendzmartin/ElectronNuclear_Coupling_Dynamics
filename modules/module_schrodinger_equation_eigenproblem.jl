@@ -410,7 +410,8 @@ function AproxDiracDeltaFunction(x,params;TypeFunction="StepFunction")
     elseif (TypeFunction=="StepFunction")
         x₀,δnorm,component,Δx=params
         q=0.5;
-        (abs(x[component]-x₀)≤(q*Δx)) ? δ=(2*q*Δx)*(1.0/δnorm) : δ=0.0
+        (abs(x[component]-x₀)≤(q*Δx)) ? δ=(1.0/δnorm) : δ=0.0
+        # (abs(x[component]-x₀)≤(q*Δx)) ? δ=(2*q*Δx)*(1.0/δnorm) : δ=0.0
         # δ=((x[component]-(x₀-q*Δx))-(x[component]-(x₀+q*Δx)))*(1.0/δnorm)
     end
     return δ

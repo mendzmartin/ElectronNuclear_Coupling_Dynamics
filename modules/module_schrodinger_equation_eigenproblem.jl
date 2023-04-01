@@ -374,15 +374,8 @@ function TimeIndependet_Diff_Shannon_Entropy(𝛹ₓ,TrialSpace,dΩ)
     for i in 1:dim𝛹ₓ
         𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[i],TrialSpace);
         𝛹ₓᵢ=𝛹ₓᵢ/norm_L2(𝛹ₓᵢ,dΩ);
-
         ρₓᵢ=real(𝛹ₓᵢ'*𝛹ₓᵢ)
-        
-        if ρₓᵢ==0.0
-            S[i]=0.0;
-            @printf("ERROR! ρₓᵢ=0, we can't compute Shannon entropy\n");
-        else
-            S[i]=-sum(integrate(ρₓᵢ*(log∘ρₓᵢ),dΩ))
-        end
+        (sum(integrate(ρₓᵢ,dΩ))==0.0) ? (S[i]=0.0) : (S[i]=-sum(integrate(ρₓᵢ*(log∘ρₓᵢ),dΩ)))
     end
     return S;
 end
@@ -409,10 +402,7 @@ function AproxDiracDeltaFunction(x,params;TypeFunction="StepFunction")
         δ=(1.0/(abs(b)*sqrt(π)))*exp(-a*pow((x[component]-x₀)*(1.0/b),2))*(1.0/δnorm)
     elseif (TypeFunction=="StepFunction")
         x₀,δnorm,component,Δx=params
-        q=0.5;
-        (abs(x[component]-x₀)≤(q*Δx)) ? δ=(1.0/δnorm) : δ=0.0
-        # (abs(x[component]-x₀)≤(q*Δx)) ? δ=(2*q*Δx)*(1.0/δnorm) : δ=0.0
-        # δ=((x[component]-(x₀-q*Δx))-(x[component]-(x₀+q*Δx)))*(1.0/δnorm)
+        (abs(x[component]-x₀)≤(0.5*Δx)) ? δ=(1.0/Δx)*(1.0/δnorm) : δ=0.0
     end
     return δ
 end

@@ -76,7 +76,7 @@ function solve(prob::EigenProblem)
   ξ,Vec = eigs(K,M;nev=prob.nev,which=prob.which,explicittransform=prob.explicittransform,
     tol=prob.tol,maxiter=prob.maxiter,sigma=prob.sigma)
   fₕs = Vector{CellField}(undef, prob.nev)
-  for m=1:prob.nev
+  Threads.@threads for m=1:prob.nev
     fₕ = FEFunction(prob.trial, Vec[:,m])
     fₕs[m] = fₕ
   end

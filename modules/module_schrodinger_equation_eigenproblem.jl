@@ -25,7 +25,7 @@ path_plots          = "../outputs/"*name_code*"/plots/";
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
 # activamos el proyecto "gridap_makie" donde se intalarán todos los paquetes
-import Pkg; Pkg.activate(path_gridap_makie);
+# import Pkg; Pkg.activate(path_gridap_makie);
 
 install_packages=true;
 if install_packages
@@ -51,7 +51,7 @@ end
 using Plots;
 
 # crear directorios en caso de no haberlo hecho
-create_directories = true;
+create_directories = false;
 if (create_directories==true)
     mkdir(path_models);
     mkdir(path_images);
@@ -102,7 +102,15 @@ end
 using DataInterpolations;   # interpolation function package (https://github.com/PumasAI/DataInterpolations.jl)
 using BenchmarkTools;       # benchmarks and performance package (https://juliaci.github.io/BenchmarkTools.jl/stable/)
 using DelimitedFiles;       # to write and read io with specific format (https://docs.julialang.org/en/v1/stdlib/DelimitedFiles/)
-# using CPUTime;              # to measure CPU time (https://juliahub.com/ui/Packages/CPUTime/tnZPT/1.0.0)
+using CPUTime;              # to measure CPU time (https://juliahub.com/ui/Packages/CPUTime/tnZPT/1.0.0)
+
+
+install_packages=true;
+if install_packages
+	import Pkg;
+	Pkg.add("SpecialFunctions");
+end
+
 
 #= +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++ Importamos módulos

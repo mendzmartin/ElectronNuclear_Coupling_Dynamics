@@ -2,6 +2,10 @@
 # módulo para construir grilla (1D)
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 name_code = "03_Code_JuliaPure";
+import Pkg;
+Pkg.resolve();
+Pkg.instantiate();
+Pkg.precompile();
 include("../modules/module_schrodinger_equation_eigenproblem.jl");
 
 # run command = julia -t 4 03_Code_JuliaPure.jl
@@ -246,7 +250,7 @@ end
     # escribimos resultados en formato vtk
     println("Writing 2D problem eigenstates and eigenvalues")
     Threads.@threads for i in 1:10#nevH      
-        writevtk(Ω_2D_χ,path_images*"eigenprob_domrχ_2D_Rcvalue$(set_Rc_value)_num$(i)",cellfields=["ρrχ_eigenstates" => real((ϕH_2D_χ[i])'*ϕH_2D_χ[i])]);
+        writevtk(Ω_2D_χ,path_images*"eigenprob_domrχ_2D_Rcvalue$(set_Rc_value)_grid$(n_1D_r)x$(n_1D_R)_num$(i)",cellfields=["ρrχ_eigenstates" => real((ϕH_2D_χ[i])'*ϕH_2D_χ[i])]);
     end
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -290,11 +294,11 @@ end
     𝛹ₓ₀_χ=create_initial_state_2D((χ₀,β,ϕH_1D_χ₀[n_eigenstate],Ω_2D_χ,dΩ_2D_χ,UH_2D_χ);TypeOfFunction="OriginalFunctionBOAprox_v4");
     # escribimos resultados en archivo vtk
     println("Writing initial condition")
-    writevtk(Ω_2D_χ,path_images*"initial_condition__domrχRcvalue$(set_Rc_value)",cellfields=["ρₓ₀" => real((𝛹ₓ₀_χ)'*𝛹ₓ₀_χ)]);
+    writevtk(Ω_2D_χ,path_images*"initial_condition__domrχRcvalue$(set_Rc_value)_grid$(n_1D_r)x$(n_1D_R)",cellfields=["ρₓ₀" => real((𝛹ₓ₀_χ)'*𝛹ₓ₀_χ)]);
 
     # chequeamos convergencia y escribimos resultados
     CheckConvergenceVector_χ=CheckConvergence(𝛹ₓ₀_χ,ϕH_2D_χ,UH_2D_χ,dΩ_2D_χ); # domino D={r,χ}
-    outfile_name = path_images*"relative_error_convergence_study_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"relative_error_convergence_study_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     println("Writing convergence information")
     write_data(CheckConvergenceVector_χ,outfile_name;delim=" ",matrix_data=false,existing_file=false)
 
@@ -315,7 +319,7 @@ end
     index_dat=0
     for i in 1:20:n_points
         global index_dat+=1
-        writevtk(Ω_2D_χ,path_images*"evolution_wave_function_domrχ_Rcvalue$(set_Rc_value)_$(lpad(index_dat,3,'0'))",cellfields=["ρₓₜ" => real((𝛹ₓₜ_χ[i])'*𝛹ₓₜ_χ[i])]);
+        writevtk(Ω_2D_χ,path_images*"evolution_wave_function_domrχ_Rcvalue$(set_Rc_value)_grid$(n_1D_r)x$(n_1D_R)_$(lpad(index_dat,3,'0'))",cellfields=["ρₓₜ" => real((𝛹ₓₜ_χ[i])'*𝛹ₓₜ_χ[i])]);
     end
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -328,14 +332,14 @@ end
     electronic_ρ_matrix_χ_plus_r=Matrix{Float64}(undef,length(electronic_ρ_matrix_χ[:,1]),length(electronic_ρ_matrix_χ[1,:])+1)
     electronic_ρ_matrix_χ_plus_r[:,1]=DOF_r[:]
     electronic_ρ_matrix_χ_plus_r[:,2:end]=electronic_ρ_matrix_χ[:,:]
-    outfile_name = path_images*"electronic_density_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"electronic_density_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(electronic_ρ_matrix_χ_plus_r,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     println("Writing nuclear probability density")
     nuclear_ρ_matrix_χ_plus_χ=Matrix{Float64}(undef,length(nuclear_ρ_matrix_χ[:,1]),length(nuclear_ρ_matrix_χ[1,:])+1)
     nuclear_ρ_matrix_χ_plus_χ[:,1]=DOF_χ[:]
     nuclear_ρ_matrix_χ_plus_χ[:,2:end]=nuclear_ρ_matrix_χ[:,:]
-    outfile_name = path_images*"nuclear_density_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"nuclear_density_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(nuclear_ρ_matrix_χ_plus_χ,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -349,7 +353,7 @@ end
     total_S_2D_χ_plus_t=Matrix{Float64}(undef,length(total_S_2D_χ[:,1]),2)
     total_S_2D_χ_plus_t[:,1]=time_vec[:]
     total_S_2D_χ_plus_t[:,2:end]=total_S_2D_χ[:,:]
-    outfile_name = path_images*"total_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"total_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     electronic_S_χ=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_r,electronic_ρ_matrix_χ)
@@ -357,7 +361,7 @@ end
     electronic_S_χ_plus_t=Matrix{Float64}(undef,length(electronic_S_χ[:,1]),2)
     electronic_S_χ_plus_t[:,1]=time_vec[:]
     electronic_S_χ_plus_t[:,2:end]=electronic_S_χ[:,:]
-    outfile_name = path_images*"electronic_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"electronic_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     nuclear_S_χ=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_χ,nuclear_ρ_matrix_χ)
@@ -365,7 +369,7 @@ end
     nuclear_S_χ_plus_t=Matrix{Float64}(undef,length(nuclear_S_χ[:,1]),2)
     nuclear_S_χ_plus_t[:,1]=time_vec[:]
     nuclear_S_χ_plus_t[:,2:end]=nuclear_S_χ[:,:]
-    outfile_name = path_images*"nuclear_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"nuclear_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     mutual_info_χ=electronic_S_χ .+ nuclear_S_χ .- total_S_2D_χ;
@@ -373,7 +377,7 @@ end
     mutual_info_χ_plus_t=Matrix{Float64}(undef,length(mutual_info_χ[:,1]),2)
     mutual_info_χ_plus_t[:,1]=time_vec[:]
     mutual_info_χ_plus_t[:,2:end]=mutual_info_χ[:,:]
-    outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x(n_1D_R).dat"
     write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -386,7 +390,7 @@ end
     r_ExpValue_χ_plus_t=Matrix{Float64}(undef,length(r_ExpValue_χ[:,1]),2)
     r_ExpValue_χ_plus_t[:,1]=time_vec[:]
     r_ExpValue_χ_plus_t[:,2:end]=r_ExpValue_χ[:,:]
-    outfile_name = path_images*"ExpectationValue_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"ExpectationValue_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(r_ExpValue_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     χ_ExpValue=position_expectation_value(𝛹ₓₜ_χ,Ω_2D_χ,dΩ_2D_χ,UH_2D_χ,2);
@@ -394,7 +398,7 @@ end
     χ_ExpValue_plus_t=Matrix{Float64}(undef,length(χ_ExpValue[:,1]),2)
     χ_ExpValue_plus_t[:,1]=time_vec[:]
     χ_ExpValue_plus_t[:,2:end]=χ_ExpValue[:,:]
-    outfile_name = path_images*"ExpectationValue_χ_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"ExpectationValue_χ_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(χ_ExpValue_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     r²_ExpValue_χ=position²_expectation_value(𝛹ₓₜ_χ,Ω_2D_χ,dΩ_2D_χ,UH_2D_χ,1);
@@ -405,7 +409,7 @@ end
     r_variance_χ_plus_t=Matrix{Float64}(undef,length(r_variance_χ[:,1]),2)
     r_variance_χ_plus_t[:,1]=time_vec[:]
     r_variance_χ_plus_t[:,2:end]=r_variance_χ[:,:]
-    outfile_name = path_images*"Variance_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"Variance_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(r_variance_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     χ_variance=sqrt.(χ²_ExpValue.-(χ_ExpValue.*χ_ExpValue));
@@ -413,6 +417,6 @@ end
     χ_variance_plus_t=Matrix{Float64}(undef,length(χ_variance[:,1]),2)
     χ_variance_plus_t[:,1]=time_vec[:]
     χ_variance_plus_t[:,2:end]=χ_variance[:,:]
-    outfile_name = path_images*"Variance_χ_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2)).dat"
+    outfile_name = path_images*"Variance_χ_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(χ_variance_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 end

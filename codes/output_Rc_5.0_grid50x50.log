@@ -1,0 +1,93 @@
++++++++++++++++++++++++++++++
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.0781132s, CPU 0s)
+Info    : 51 nodes 52 elements
+Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r.msh'...
+Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r.msh'
+Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r.msh'...
+Info    : 3 entities
+Info    : 51 nodes
+Info    : 52 elements
+Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r.msh'
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.156051s, CPU 0.000241s)
+Info    : 51 nodes 52 elements
+Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ.msh'...
+Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ.msh'
+Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ.msh'...
+Info    : 3 entities
+Info    : 51 nodes
+Info    : 52 elements
+Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ.msh'
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+Precompiling project...
+[91m  ✗ [39m[90mHTTP[39m
+  0 dependencies successfully precompiled in 3 seconds. 201 already precompiled.
+    Updating registry at `~/.conda/envs/julia/share/julia/registries/General.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+   Resolving package versions...
+    Updating `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
+  [276daf66] + SpecialFunctions v2.2.0
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+Number of threads = 4
+ΔrH=0.48[Å]; ΔRH=8.77[Å]; ΔχH=0.2[Å]
+n_1D_r*n_1D_R=2500 FE
+Set Electron-Nuclear potential
+Writing 2D problem eigenstates and eigenvalues
+Writing initial condition
+Writing convergence information
+Δt=2.18884[fs]; dim(time_vec)=92
+Writing evolution of wave function
+Writing electronic probability density
+Writing nuclear probability density
+Writing total Shannon entropy
+Writing electronic Shannon entropy
+Writing nuclear Shannon entropy
+Writing mutual information
+Writing expectation value of electronic coordinate
+Writing expectation value of nuclear coordinate
+Writing variance of electronic coordinate
+Writing variance of nuclear coordinate
+3799.716262 seconds (4.43 G allocations: 1.764 TiB, 4.72% gc time, 4.73% compilation time: 1% of which was recompilation)
++++++++++++++++++++++++++++++

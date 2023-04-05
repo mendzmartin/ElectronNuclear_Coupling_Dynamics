@@ -27,7 +27,7 @@ path_plots          = "../outputs/"*name_code*"/plots/";
 # activamos el proyecto "gridap_makie" donde se intalarán todos los paquetes
 # import Pkg; Pkg.activate(path_gridap_makie);
 
-install_packages=true;
+install_packages=false;
 if install_packages
     import Pkg
     Pkg.add("Gridap");
@@ -43,7 +43,7 @@ using Gridap.CellData;  # para construir condición inicial interpolando una fun
 using Gridap.FESpaces;  # para crear matrices afines a partir de formas bilineales
 using Gridap.Algebra;   # para utilizar operaciones algebraicas con Gridap
 
-install_packages=true;
+install_packages=false;
 if install_packages
     import Pkg
     Pkg.add("Plots")
@@ -78,7 +78,7 @@ using Printf; # para imprimir salidas con formatos
 ++ Instalamos paquetes para operaciones algebraicas
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
-install_packages=true;
+install_packages=false;
 if install_packages
     import Pkg;
     Pkg.add("LinearAlgebra");
@@ -91,7 +91,7 @@ using SparseArrays;
 using SuiteSparse;
 using Arpack;
 
-install_packages=true;
+install_packages=false;
 if install_packages
     import Pkg;
     Pkg.add("DataInterpolations");
@@ -105,7 +105,7 @@ using DelimitedFiles;       # to write and read io with specific format (https:/
 using CPUTime;              # to measure CPU time (https://juliahub.com/ui/Packages/CPUTime/tnZPT/1.0.0)
 
 
-install_packages=true;
+install_packages=false;
 if install_packages
 	import Pkg;
 	Pkg.add("SpecialFunctions");

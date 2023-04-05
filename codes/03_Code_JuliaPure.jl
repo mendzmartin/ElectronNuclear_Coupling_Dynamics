@@ -2,10 +2,7 @@
 # módulo para construir grilla (1D)
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 name_code = "03_Code_JuliaPure";
-import Pkg;
-Pkg.resolve();
-Pkg.instantiate();
-Pkg.precompile();
+# import Pkg;Pkg.resolve();Pkg.instantiate();Pkg.precompile();
 include("../modules/module_schrodinger_equation_eigenproblem.jl");
 
 # run command = julia -t 4 03_Code_JuliaPure.jl
@@ -175,7 +172,7 @@ end
     # cantidad de FE y dominio espacial
     dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
     # cantidad de FE por dimension (cantidad de intervalos)
-    n_1D_r=50;n_1D_R=50;
+    n_1D_r=512;n_1D_R=512;
     # tamaño del elemento 2D
     ΔrH=abs(dom_2D[2]-dom_2D[1])*(1.0/n_1D_r); ΔRH=abs(dom_2D[4]-dom_2D[3])*(1.0/n_1D_R);
 
@@ -377,7 +374,7 @@ end
     mutual_info_χ_plus_t=Matrix{Float64}(undef,length(mutual_info_χ[:,1]),2)
     mutual_info_χ_plus_t[:,1]=time_vec[:]
     mutual_info_χ_plus_t[:,2:end]=mutual_info_χ[:,:]
-    outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x(n_1D_R).dat"
+    outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++

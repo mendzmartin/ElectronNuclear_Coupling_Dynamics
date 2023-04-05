@@ -27,7 +27,7 @@ path_plots          = "../outputs/"*name_code*"/plots/";
 # activamos el proyecto "gridap_makie" donde se intalarán todos los paquetes
 import Pkg; Pkg.activate(path_gridap_makie);
 
-install_packages=false;
+install_packages=true;
 if install_packages
     import Pkg
     Pkg.add("Gridap");
@@ -43,7 +43,7 @@ using Gridap.CellData;  # para construir condición inicial interpolando una fun
 using Gridap.FESpaces;  # para crear matrices afines a partir de formas bilineales
 using Gridap.Algebra;   # para utilizar operaciones algebraicas con Gridap
 
-install_packages=false;
+install_packages=true;
 if install_packages
     import Pkg
     Pkg.add("Plots")
@@ -51,7 +51,7 @@ end
 using Plots;
 
 # crear directorios en caso de no haberlo hecho
-create_directories = false;
+create_directories = true;
 if (create_directories==true)
     mkdir(path_models);
     mkdir(path_images);
@@ -78,7 +78,7 @@ using Printf; # para imprimir salidas con formatos
 ++ Instalamos paquetes para operaciones algebraicas
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
-install_packages=false;
+install_packages=true;
 if install_packages
     import Pkg;
     Pkg.add("LinearAlgebra");
@@ -91,14 +91,18 @@ using SparseArrays;
 using SuiteSparse;
 using Arpack;
 
-install_packages=false;
+install_packages=true;
 if install_packages
     import Pkg;
     Pkg.add("DataInterpolations");
     Pkg.add("BenchmarkTools");
+    Pkg.add("CPUTime");
+    Pkg.add("DelimitedFiles");
 end
 using DataInterpolations;   # interpolation function package (https://github.com/PumasAI/DataInterpolations.jl)
 using BenchmarkTools;       # benchmarks and performance package (https://juliaci.github.io/BenchmarkTools.jl/stable/)
+using DelimitedFiles;       # to write and read io with specific format (https://docs.julialang.org/en/v1/stdlib/DelimitedFiles/)
+# using CPUTime;              # to measure CPU time (https://juliahub.com/ui/Packages/CPUTime/tnZPT/1.0.0)
 
 #= +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++ Importamos módulos
@@ -250,8 +254,7 @@ end
 =#
 function normalization_eigenstates(ϕ,TrialSpace,dΩ)
     nom_vec=zeros(Float64,length(ϕ))
-    for i in 1:length(ϕ)
-        ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
+    Threads.@threads for i in 1:length(ϕ)
         nom_vec[i]=norm_L2(ϕ[i],dΩ)
     end
     return nom_vec;
@@ -262,12 +265,10 @@ end
 =#
 function normalization_eigenstates_multifield(ϕ,TrialSpace,dΩ)
     nom_vec₁₂=zeros(Float64,length(ϕ))
-    for i in 1:length(ϕ)
+    Threads.@threads for i in 1:length(ϕ)
         ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
         ϕ¹ᵢ,ϕ²ᵢ=ϕᵢ
-        norm_ϕ¹ᵢ=norm_L2(ϕ¹ᵢ,dΩ)
-        norm_ϕ²ᵢ=norm_L2(ϕ²ᵢ,dΩ)
-        nom_vec₁₂[i]=norm_ϕ¹ᵢ+norm_ϕ²ᵢ
+        nom_vec₁₂[i]=norm_L2(ϕ¹ᵢ,dΩ)+norm_L2(ϕ²ᵢ,dΩ)
     end
     return nom_vec₁₂;
 end
@@ -371,7 +372,7 @@ end
 function TimeIndependet_Diff_Shannon_Entropy(𝛹ₓ,TrialSpace,dΩ)
     dim𝛹ₓ=length(𝛹ₓ)
     S=zeros(Float64,dim𝛹ₓ)
-    for i in 1:dim𝛹ₓ
+    Threads.@threads for i in 1:dim𝛹ₓ
         𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[i],TrialSpace);
         𝛹ₓᵢ=𝛹ₓᵢ/norm_L2(𝛹ₓᵢ,dΩ);
         ρₓᵢ=real(𝛹ₓᵢ'*𝛹ₓᵢ)
@@ -450,7 +451,7 @@ end
 function CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
     dim=length(ϕₙ)
     coeffvec₁₂=zeros(ComplexF64,dim); # vector global de productos internos entre autoestados y estado inicial
-    for i in 1:dim
+    Threads.@threads for i in 1:dim
         ϕᵢ=interpolate_everywhere(ϕₙ[i],TrialSpace);
         coeffvec₁₂[i]=sum(∫(ϕᵢ'*𝛹ₓ₀)*dΩ)
     end
@@ -524,6 +525,31 @@ function evolution_schrodinger_v2(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec
             𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace);
             Norm𝛹ₓₜⁱ=norm_L2(𝛹ₓₜ[i],dΩ)
             𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ*(1.0/Norm𝛹ₓₜⁱ)),TrialSpace)
+        end
+    end
+    return 𝛹ₓₜ;
+end
+
+function evolution_schrodinger_v3(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
+    dim_time=length(time_vec)
+    # calculamos los coeficientes de la superposición lineal
+    coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    𝛹ₓₜ=Vector{CellField}(undef,dim_time);
+    factor=similar(ϵₙ)
+    # inicializamos en cero el vector de onda
+    Threads.@threads for i in 1:dim_time
+        𝛹ₓₜ[i] = interpolate_everywhere(0.0*ϕₙ[1],TrialSpace)
+        factor .= coeffvec₁₂ .* exp.((-im*(1.0/ħ)*time_vec[i]).*real(ϵₙ))
+        for j in 1:length(ϵₙ)
+            𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
+            ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
+            𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ+factor[j]*ϕⱼ),TrialSpace)
+        end
+        # normalizamos la función de onda luego de cada evolución
+        norm_switch=true
+        if norm_switch
+            𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace);
+            𝛹ₓₜ[i]=interpolate_everywhere((𝛹ₓₜⁱ*(1.0/norm_L2(𝛹ₓₜ[i],dΩ))),TrialSpace)
         end
     end
     return 𝛹ₓₜ;

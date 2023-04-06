@@ -2,10 +2,10 @@
 
 #$ -cwd
 #$ -m bea -M martinmendez@mi.unc.edu.ar
-#$ -N julia50x50
+#$ -N julia100x100
 #$ -j y
 #$ -pe smp 4
-#$ -o output_Rc_5.0_grid50x50.log
+#$ -o output_Rc_5.0_grid100x100.log
 ##$ -S /bin/bash
 ##$ -l mem_free=4.2G
 ##$ -v OMP_NUM_THREADS=4

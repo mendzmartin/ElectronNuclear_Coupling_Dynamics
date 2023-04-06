@@ -1,31 +1,34 @@
 +++++++++++++++++++++++++++++
+# conda environments:
+#
+SineDVROpenBLAS          /nashome/mmendez/.conda/envs/SineDVROpenBLAS
+cp2021                   /nashome/mmendez/.conda/envs/cp2021
+julia                 *  /nashome/mmendez/.conda/envs/julia
+base                     /share/apps/intel/oneapi/intelpython/latest
+2021.1.1                 /share/apps/intel/oneapi/intelpython/latest/envs/2021.1.1
+
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.0781132s, CPU 0s)
+Info    : Done meshing 1D (Wall 0.0201729s, CPU 0.000116s)
 Info    : 51 nodes 52 elements
-Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r.msh'...
-Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r.msh'
-Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r.msh'...
+Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid50x50.msh'...
+Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid50x50.msh'
+Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid50x50.msh'...
 Info    : 3 entities
 Info    : 51 nodes
 Info    : 52 elements
-Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r.msh'
+Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid50x50.msh'
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.156051s, CPU 0.000241s)
+Info    : Done meshing 1D (Wall 0.0217527s, CPU 0.0001s)
 Info    : 51 nodes 52 elements
-Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ.msh'...
-Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ.msh'
-Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ.msh'...
+Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid50x50.msh'...
+Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid50x50.msh'
+Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid50x50.msh'...
 Info    : 3 entities
 Info    : 51 nodes
 Info    : 52 elements
-Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ.msh'
-  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
-  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
-Precompiling project...
-[91m  ✗ [39m[90mHTTP[39m
-  0 dependencies successfully precompiled in 3 seconds. 201 already precompiled.
+Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid50x50.msh'
     Updating registry at `~/.conda/envs/julia/share/julia/registries/General.toml`
    Resolving package versions...
   No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
@@ -67,9 +70,10 @@ Precompiling project...
   No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
   No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
    Resolving package versions...
-    Updating `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
-  [276daf66] + SpecialFunctions v2.2.0
+  No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
   No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+incluyendo módulo schrodinger
+incluido módulo schrodinger
 Number of threads = 4
 ΔrH=0.48[Å]; ΔRH=8.77[Å]; ΔχH=0.2[Å]
 n_1D_r*n_1D_R=2500 FE
@@ -89,5 +93,5 @@ Writing expectation value of electronic coordinate
 Writing expectation value of nuclear coordinate
 Writing variance of electronic coordinate
 Writing variance of nuclear coordinate
-3799.716262 seconds (4.43 G allocations: 1.764 TiB, 4.72% gc time, 4.73% compilation time: 1% of which was recompilation)
+500.697464 seconds (2.30 G allocations: 743.206 GiB, 6.08% gc time, 12.88% compilation time: 1% of which was recompilation)
 +++++++++++++++++++++++++++++

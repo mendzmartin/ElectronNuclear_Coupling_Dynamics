@@ -2,8 +2,10 @@
 # módulo para construir grilla (1D)
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 name_code = "03_Code_JuliaPure";
-# import Pkg;Pkg.resolve();Pkg.instantiate();Pkg.precompile();
+#import Pkg;Pkg.resolve();Pkg.instantiate();Pkg.precompile();
+println("incluyendo módulo schrodinger");
 include("../modules/module_schrodinger_equation_eigenproblem.jl");
+println("incluido módulo schrodinger");
 
 # run command = julia -t 4 03_Code_JuliaPure.jl
 
@@ -172,7 +174,7 @@ end
     # cantidad de FE y dominio espacial
     dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
     # cantidad de FE por dimension (cantidad de intervalos)
-    n_1D_r=512;n_1D_R=512;
+    n_1D_r=50;n_1D_R=50;
     # tamaño del elemento 2D
     ΔrH=abs(dom_2D[2]-dom_2D[1])*(1.0/n_1D_r); ΔRH=abs(dom_2D[4]-dom_2D[3])*(1.0/n_1D_R);
 
@@ -215,7 +217,7 @@ end
     aH_2D,bH_2D=bilineal_forms(pH_2D,qH_2D,rH_2D,dΩ_2D);
 
     # solve eigenvalue problem
-    nevH=500;
+    nevH=200;
     probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D,VH_2D;nev=nevH,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
     ϵH_2D,ϕH_2D=solve(probH_2D);
 
@@ -262,8 +264,8 @@ end
     dom_1D_r=(dom_2D[1],dom_2D[2]);
     dom_1D_χ=(dom_2D[3]./γ,dom_2D[4]./γ);
     # (path,name,dom,MeshSize)
-    par_1D_r=(path_models,grid_type*"_01_r",dom_1D_r,ΔrH_1D);
-    par_1D_χ=(path_models,grid_type*"_01_χ",dom_1D_χ,ΔχH_1D);
+    par_1D_r=(path_models,grid_type*"_01_r_grid$(n_1D_r)x$(n_1D_R)",dom_1D_r,ΔrH_1D);
+    par_1D_χ=(path_models,grid_type*"_01_χ_grid$(n_1D_r)x$(n_1D_R)",dom_1D_χ,ΔχH_1D);
     # creamos modelo
     model_1D_r=make_model(grid_type,par_1D_r);
     model_1D_χ=make_model(grid_type,par_1D_χ);
@@ -359,7 +361,7 @@ end
     electronic_S_χ_plus_t[:,1]=time_vec[:]
     electronic_S_χ_plus_t[:,2:end]=electronic_S_χ[:,:]
     outfile_name = path_images*"electronic_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(electronic_S_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     nuclear_S_χ=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_χ,nuclear_ρ_matrix_χ)
     println("Writing nuclear Shannon entropy")
@@ -367,7 +369,7 @@ end
     nuclear_S_χ_plus_t[:,1]=time_vec[:]
     nuclear_S_χ_plus_t[:,2:end]=nuclear_S_χ[:,:]
     outfile_name = path_images*"nuclear_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(nuclear_S_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     mutual_info_χ=electronic_S_χ .+ nuclear_S_χ .- total_S_2D_χ;
     println("Writing mutual information")
@@ -375,7 +377,7 @@ end
     mutual_info_χ_plus_t[:,1]=time_vec[:]
     mutual_info_χ_plus_t[:,2:end]=mutual_info_χ[:,:]
     outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(mutual_info_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Calculamos valores medios de la posición y varianza, y

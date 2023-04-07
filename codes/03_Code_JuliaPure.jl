@@ -201,7 +201,7 @@ end
     R₁=-5.0*Angstrom_to_au;R₂=5.0*Angstrom_to_au;Rf=1.5*Angstrom_to_au;
     β=3.57*(1.0/(Angstrom_to_au*Angstrom_to_au));
 
-    set_Rc_value=2; # set_Rc_value=1 or set_Rc_value=2
+    set_Rc_value=1; # set_Rc_value=1 or set_Rc_value=2
     if (set_Rc_value==1)
         Rc=1.5*Angstrom_to_au;  # screening parameter
         χ₀=-3.5*Angstrom_to_au; # Gaussian's center of init state
@@ -217,7 +217,7 @@ end
     aH_2D,bH_2D=bilineal_forms(pH_2D,qH_2D,rH_2D,dΩ_2D);
 
     # solve eigenvalue problem
-    nevH=200;
+    nevH=300;
     probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D,VH_2D;nev=nevH,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
     ϵH_2D,ϕH_2D=solve(probH_2D);
 

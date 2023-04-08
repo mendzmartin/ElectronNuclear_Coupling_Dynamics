@@ -7,31 +7,6 @@ julia                 *  /nashome/mmendez/.conda/envs/julia
 base                     /share/apps/intel/oneapi/intelpython/latest
 2021.1.1                 /share/apps/intel/oneapi/intelpython/latest/envs/2021.1.1
 
-Info    : Meshing 1D...
-Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.0210407s, CPU 0.000204s)
-Info    : 101 nodes 102 elements
-Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid100x100.msh'...
-Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid100x100.msh'
-Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid100x100.msh'...
-Info    : 3 entities
-Info    : 101 nodes
-Info    : 102 elements
-Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid100x100.msh'
-Info    : Meshing 1D...
-Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.0583047s, CPU 9.7e-05s)
-Info    : 101 nodes 102 elements
-Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid100x100.msh'...
-Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid100x100.msh'
-Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid100x100.msh'...
-Info    : 3 entities
-Info    : 101 nodes
-Info    : 102 elements
-Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid100x100.msh'
-┌ Warning: could not download https://pkg.julialang.org/registries
-│   exception = HTTP/2 301 (Could not resolve host: sa.pkg.julialang.org) while requesting https://pkg.julialang.org/registries
-└ @ Pkg.Registry /home/conda/feedstock_root/build_artifacts/julia_1673193924586/work/usr/share/julia/stdlib/v1.8/Pkg/src/Registry/Registry.jl:68
     Updating registry at `~/.conda/envs/julia/share/julia/registries/General.toml`
    Resolving package versions...
   No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
@@ -75,13 +50,27 @@ Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_gr
    Resolving package versions...
   No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
   No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Manifest.toml`
+ERROR: LoadError: OutOfMemoryError()
+Stacktrace:
+ [1] Matrix{ComplexF64}(#unused#::UndefInitializer, m::Int64, n::Int64)
+   @ Core ./boot.jl:461
+ [2] aupd_wrapper(T::Type, matvecA!::Arpack.var"#12#22"{SparseMatrixCSC{ComplexF64, Int64}}, matvecB::Arpack.var"#19#29"{SparseMatrixCSC{ComplexF64, Int64}}, solveSI::Arpack.var"#21#31", n::Int64, sym::Bool, cmplx::Bool, bmat::String, nev::Int64, ncv::Int64, which::String, tol::Float64, maxiter::Int64, mode::Int64, v0::Vector{ComplexF64}, check::Int64)
+   @ Arpack ~/.conda/envs/julia/share/julia/packages/Arpack/FCvNd/src/libarpack.jl:104
+ [3] _eigs(A::SparseMatrixCSC{ComplexF64, Int64}, B::SparseMatrixCSC{ComplexF64, Int64}; nev::Int64, ncv::Int64, which::Symbol, tol::Float64, maxiter::Int64, sigma::Float64, v0::Vector{ComplexF64}, ritzvec::Bool, explicittransform::Symbol, check::Int64)
+   @ Arpack ~/.conda/envs/julia/share/julia/packages/Arpack/FCvNd/src/Arpack.jl:240
+ [4] #eigs#5
+   @ ~/.conda/envs/julia/share/julia/packages/Arpack/FCvNd/src/Arpack.jl:53 [inlined]
+ [5] solve(prob::EigenProblem)
+   @ Main ~/github_repositories/my_repositories/ElectronNuclear_Coupling_Dynamics/modules/module_eigen.jl:76
+ [6] macro expansion
+   @ ~/github_repositories/my_repositories/ElectronNuclear_Coupling_Dynamics/codes/03_Code_JuliaPure.jl:222 [inlined]
+ [7] top-level scope
+   @ ./timing.jl:262
+in expression starting at /nashome/mmendez/github_repositories/my_repositories/ElectronNuclear_Coupling_Dynamics/codes/03_Code_JuliaPure.jl:168
 incluyendo módulo schrodinger
 incluido módulo schrodinger
 Number of threads = 4
-ΔrH=0.24[Å]; ΔRH=4.38[Å]; ΔχH=0.1[Å]
-n_1D_r*n_1D_R=10000 FE
+ΔrH=0.05[Å]; ΔRH=0.86[Å]; ΔχH=0.02[Å]
+n_1D_r*n_1D_R=262144 FE
 Set Electron-Nuclear potential
-Writing 2D problem eigenstates and eigenvalues
-Writing initial condition
-Writing convergence information
 +++++++++++++++++++++++++++++

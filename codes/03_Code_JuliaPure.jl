@@ -170,11 +170,11 @@ end
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Resolvemos el problema 2D
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    existing_data=true
+    existing_data=false
     # cantidad de FE y dominio espacial
     dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
     # cantidad de FE por dimension (cantidad de intervalos)
-    n_1D_r=100;n_1D_R=100;
+    n_1D_r=300;n_1D_R=300;
     # tamaño del elemento 2D
     ΔrH=abs(dom_2D[2]-dom_2D[1])*(1.0/n_1D_r); ΔRH=abs(dom_2D[4]-dom_2D[3])*(1.0/n_1D_R);
 
@@ -217,7 +217,7 @@ end
     aH_2D,bH_2D=bilineal_forms(pH_2D,qH_2D,rH_2D,dΩ_2D);
 
     # solve eigenvalue problem
-    nevH=500;
+    nevH=800;
     probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D,VH_2D;nev=nevH,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
     ϵH_2D,ϕH_2D=solve(probH_2D);
 
@@ -236,7 +236,7 @@ end
     UH_2D_χ=TrialFESpace(VH_2D_χ,dirichlet_values_2D);
     DOF_r,DOF_χ,pts_χ=space_coord_2D(dom_2D_χ,ΔrH,ΔχH);
 
-    nevHχ=nevH # debe cumplirse que nevHχ ≤ nevH
+    nevHχ=length(ϵH_2D); # debe cumplirse que nevHχ ≤ nevH
     ϕH_2D_χ=Vector{CellField}(undef,nevHχ);
     Threads.@threads for i in 1:nevHχ
         # le decimos que sea un objeto interpolable
@@ -300,6 +300,8 @@ end
     outfile_name = path_images*"relative_error_convergence_study_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     println("Writing convergence information")
     write_data(CheckConvergenceVector_χ,outfile_name;delim=" ",matrix_data=false,existing_file=existing_data)
+
+    #exit()
 
     # tiempos adimensionales inicial y final
     t_start=0.0;t_end=200*Femtoseconds_to_au;

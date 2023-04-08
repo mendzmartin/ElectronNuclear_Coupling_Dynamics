@@ -1,0 +1,18 @@
++++++++++++++++++++++++++++++
+# conda environments:
+#
+SineDVROpenBLAS          /nashome/mmendez/.conda/envs/SineDVROpenBLAS
+cp2021                   /nashome/mmendez/.conda/envs/cp2021
+julia                 *  /nashome/mmendez/.conda/envs/julia
+base                     /share/apps/intel/oneapi/intelpython/latest
+2021.1.1                 /share/apps/intel/oneapi/intelpython/latest/envs/2021.1.1
+
++++++++++++++++++++++++++++++
+# conda environments:
+#
+SineDVROpenBLAS          /nashome/mmendez/.conda/envs/SineDVROpenBLAS
+cp2021                   /nashome/mmendez/.conda/envs/cp2021
+julia                 *  /nashome/mmendez/.conda/envs/julia
+base                     /share/apps/intel/oneapi/intelpython/latest
+2021.1.1                 /share/apps/intel/oneapi/intelpython/latest/envs/2021.1.1
+

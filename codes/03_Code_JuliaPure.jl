@@ -170,7 +170,7 @@ end
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Resolvemos el problema 2D
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+    existing_data=true
     # cantidad de FE y dominio espacial
     dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
     # cantidad de FE por dimension (cantidad de intervalos)
@@ -217,7 +217,7 @@ end
     aH_2D,bH_2D=bilineal_forms(pH_2D,qH_2D,rH_2D,dΩ_2D);
 
     # solve eigenvalue problem
-    nevH=300;
+    nevH=500;
     probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D,VH_2D;nev=nevH,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
     ϵH_2D,ϕH_2D=solve(probH_2D);
 
@@ -299,7 +299,7 @@ end
     CheckConvergenceVector_χ=CheckConvergence(𝛹ₓ₀_χ,ϕH_2D_χ,UH_2D_χ,dΩ_2D_χ); # domino D={r,χ}
     outfile_name = path_images*"relative_error_convergence_study_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     println("Writing convergence information")
-    write_data(CheckConvergenceVector_χ,outfile_name;delim=" ",matrix_data=false,existing_file=false)
+    write_data(CheckConvergenceVector_χ,outfile_name;delim=" ",matrix_data=false,existing_file=existing_data)
 
     # tiempos adimensionales inicial y final
     t_start=0.0;t_end=200*Femtoseconds_to_au;
@@ -332,14 +332,14 @@ end
     electronic_ρ_matrix_χ_plus_r[:,1]=DOF_r[:]
     electronic_ρ_matrix_χ_plus_r[:,2:end]=electronic_ρ_matrix_χ[:,:]
     outfile_name = path_images*"electronic_density_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(electronic_ρ_matrix_χ_plus_r,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(electronic_ρ_matrix_χ_plus_r,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     println("Writing nuclear probability density")
     nuclear_ρ_matrix_χ_plus_χ=Matrix{Float64}(undef,length(nuclear_ρ_matrix_χ[:,1]),length(nuclear_ρ_matrix_χ[1,:])+1)
     nuclear_ρ_matrix_χ_plus_χ[:,1]=DOF_χ[:]
     nuclear_ρ_matrix_χ_plus_χ[:,2:end]=nuclear_ρ_matrix_χ[:,:]
     outfile_name = path_images*"nuclear_density_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(nuclear_ρ_matrix_χ_plus_χ,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(nuclear_ρ_matrix_χ_plus_χ,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Calculamos las entropías diferenciales de Shannon y
@@ -353,7 +353,7 @@ end
     total_S_2D_χ_plus_t[:,1]=time_vec[:]
     total_S_2D_χ_plus_t[:,2:end]=total_S_2D_χ[:,:]
     outfile_name = path_images*"total_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(total_S_2D_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     electronic_S_χ=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_r,electronic_ρ_matrix_χ)
     println("Writing electronic Shannon entropy")
@@ -361,7 +361,7 @@ end
     electronic_S_χ_plus_t[:,1]=time_vec[:]
     electronic_S_χ_plus_t[:,2:end]=electronic_S_χ[:,:]
     outfile_name = path_images*"electronic_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(electronic_S_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(electronic_S_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     nuclear_S_χ=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_χ,nuclear_ρ_matrix_χ)
     println("Writing nuclear Shannon entropy")
@@ -369,7 +369,7 @@ end
     nuclear_S_χ_plus_t[:,1]=time_vec[:]
     nuclear_S_χ_plus_t[:,2:end]=nuclear_S_χ[:,:]
     outfile_name = path_images*"nuclear_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(nuclear_S_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(nuclear_S_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     mutual_info_χ=electronic_S_χ .+ nuclear_S_χ .- total_S_2D_χ;
     println("Writing mutual information")
@@ -377,7 +377,7 @@ end
     mutual_info_χ_plus_t[:,1]=time_vec[:]
     mutual_info_χ_plus_t[:,2:end]=mutual_info_χ[:,:]
     outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(mutual_info_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(mutual_info_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Calculamos valores medios de la posición y varianza, y
@@ -390,7 +390,7 @@ end
     r_ExpValue_χ_plus_t[:,1]=time_vec[:]
     r_ExpValue_χ_plus_t[:,2:end]=r_ExpValue_χ[:,:]
     outfile_name = path_images*"ExpectationValue_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(r_ExpValue_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(r_ExpValue_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     χ_ExpValue=position_expectation_value(𝛹ₓₜ_χ,Ω_2D_χ,dΩ_2D_χ,UH_2D_χ,2);
     println("Writing expectation value of nuclear coordinate")
@@ -398,7 +398,7 @@ end
     χ_ExpValue_plus_t[:,1]=time_vec[:]
     χ_ExpValue_plus_t[:,2:end]=χ_ExpValue[:,:]
     outfile_name = path_images*"ExpectationValue_χ_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(χ_ExpValue_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(χ_ExpValue_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     r²_ExpValue_χ=position²_expectation_value(𝛹ₓₜ_χ,Ω_2D_χ,dΩ_2D_χ,UH_2D_χ,1);
     χ²_ExpValue=position²_expectation_value(𝛹ₓₜ_χ,Ω_2D_χ,dΩ_2D_χ,UH_2D_χ,2);
@@ -409,7 +409,7 @@ end
     r_variance_χ_plus_t[:,1]=time_vec[:]
     r_variance_χ_plus_t[:,2:end]=r_variance_χ[:,:]
     outfile_name = path_images*"Variance_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(r_variance_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(r_variance_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     χ_variance=sqrt.(χ²_ExpValue.-(χ_ExpValue.*χ_ExpValue));
     println("Writing variance of nuclear coordinate")
@@ -417,5 +417,5 @@ end
     χ_variance_plus_t[:,1]=time_vec[:]
     χ_variance_plus_t[:,2:end]=χ_variance[:,:]
     outfile_name = path_images*"Variance_χ_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
-    write_data(χ_variance_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=false)
+    write_data(χ_variance_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 end

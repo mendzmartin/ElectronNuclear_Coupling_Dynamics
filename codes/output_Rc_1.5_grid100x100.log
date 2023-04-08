@@ -9,7 +9,7 @@ base                     /share/apps/intel/oneapi/intelpython/latest
 
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.0190676s, CPU 8.9e-05s)
+Info    : Done meshing 1D (Wall 0.0718043s, CPU 0.000137s)
 Info    : 101 nodes 102 elements
 Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid100x100.msh'...
 Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid100x100.msh'
@@ -20,7 +20,7 @@ Info    : 102 elements
 Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid100x100.msh'
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.0239043s, CPU 0.000122s)
+Info    : Done meshing 1D (Wall 0.0217167s, CPU 0.000113s)
 Info    : 101 nodes 102 elements
 Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid100x100.msh'...
 Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid100x100.msh'
@@ -29,6 +29,9 @@ Info    : 3 entities
 Info    : 101 nodes
 Info    : 102 elements
 Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid100x100.msh'
+┌ Warning: could not download https://pkg.julialang.org/registries
+│   exception = HTTP/2 301 (Could not resolve host: sa.pkg.julialang.org) while requesting https://pkg.julialang.org/registries
+└ @ Pkg.Registry /home/conda/feedstock_root/build_artifacts/julia_1673193924586/work/usr/share/julia/stdlib/v1.8/Pkg/src/Registry/Registry.jl:68
     Updating registry at `~/.conda/envs/julia/share/julia/registries/General.toml`
    Resolving package versions...
   No Changes to `~/.conda/envs/julia/share/julia/environments/julia/Project.toml`
@@ -93,5 +96,5 @@ Writing expectation value of electronic coordinate
 Writing expectation value of nuclear coordinate
 Writing variance of electronic coordinate
 Writing variance of nuclear coordinate
-5408.168791 seconds (13.11 G allocations: 13.799 TiB, 3.09% gc time, 1.00% compilation time: 1% of which was recompilation)
+9100.742326 seconds (18.59 G allocations: 22.913 TiB, 3.02% gc time, 0.58% compilation time: 1% of which was recompilation)
 +++++++++++++++++++++++++++++

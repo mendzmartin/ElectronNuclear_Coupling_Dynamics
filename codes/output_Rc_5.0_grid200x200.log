@@ -1,0 +1,50 @@
++++++++++++++++++++++++++++++
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.0867159s, CPU 0.00014s)
+Info    : 201 nodes 202 elements
+Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid200x200.msh'...
+Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid200x200.msh'
+Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid200x200.msh'...
+Info    : 3 entities
+Info    : 201 nodes
+Info    : 202 elements
+Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid200x200.msh'
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.147647s, CPU 0.000141s)
+Info    : 201 nodes 202 elements
+Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid200x200.msh'...
+Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid200x200.msh'
+Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid200x200.msh'...
+Info    : 3 entities
+Info    : 201 nodes
+Info    : 202 elements
+Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid200x200.msh'
+incluyendo módulo schrodinger
+incluido módulo schrodinger
+Number of threads = 4
+ΔrH=0.12[Å]; ΔRH=2.19[Å]; ΔχH=0.05[Å]
+n_1D_r*n_1D_R=40000 FE
+Set Electron-Nuclear potential
+Writing 2D problem eigenstates and eigenvalues
+Writing initial condition
+Writing convergence information
+Δt=2.18884[fs]; dim(time_vec)=92
+Writing evolution of wave function
+Writing electronic probability density
+Writing nuclear probability density
+Writing total Shannon entropy
+Writing electronic Shannon entropy
+Writing nuclear Shannon entropy
+Writing mutual information
+Writing total Renyi entropy
+Writing electronic Renyi entropy
+Writing nuclear Renyi entropy
+Writing mutual information
+Writing expectation value of electronic coordinate
+Writing expectation value of nuclear coordinate
+Writing variance of electronic coordinate
+Writing variance of nuclear coordinate
+33716.560306 seconds (47.09 G allocations: 69.625 TiB, 1.58% gc time, 0.21% compilation time: 1% of which was recompilation)
++++++++++++++++++++++++++++++

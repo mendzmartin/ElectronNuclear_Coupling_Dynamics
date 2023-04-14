@@ -6,7 +6,7 @@
 #$ -j y
 #$ -pe smp 4
 #$ -o output_Rc_1.5_grid150x150.log
-#$ -l h=!compute-0-12&!compute-0-11&!compute-0-10&!compute-0-9&!compute-0-13
+#$ -l h=!compute-0-12&!compute-0-11&!compute-0-10&!compute-0-9&!compute-0-13&!compute-0-7&!compute-0-6&!compute-0-5
 ##$ -S /bin/bash
 ##$ -l mem_free=4.2G
 ##$ -v OMP_NUM_THREADS=4

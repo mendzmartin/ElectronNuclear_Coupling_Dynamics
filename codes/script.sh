@@ -2,14 +2,15 @@
 
 #$ -cwd
 #$ -m bea -M martinmendez@mi.unc.edu.ar
-#$ -N g150Rc1.5
+#$ -N g200Rc1.5
 #$ -j y
-#$ -pe smp 4
-#$ -o output_Rc_1.5_grid150x150.log
-#$ -l h=!compute-0-12&!compute-0-11&!compute-0-10&!compute-0-9&!compute-0-13&!compute-0-7&!compute-0-6&!compute-0-5
+#$ -pe smp 8
+#$ -o output_Rc_1.5_grid200x200.log
+#$ -q long@compute-0-26,long@compute-0-27,long@compute-0-22,long@compute-0-23
+##$ -l h=!compute-0-12&!compute-0-11&!compute-0-10&!compute-0-9&!compute-0-13&!compute-0-7&!compute-0-6&!compute-0-5
 ##$ -S /bin/bash
 ##$ -l mem_free=4.2G
-##$ -v OMP_NUM_THREADS=4
+##$ -v OMP_NUM_THREADS=8
 ##$ -R y
 ##$ -l h_rt=02:00:00
 ##export DMTCP_DL_PLUGIN=0
@@ -20,7 +21,7 @@ echo '+++++++++++++++++++++++++++++'
 #conda init bash
 #conda activate julia
 #conda env list
-julia -O3 -t 4 03_Code_JuliaPure.jl
+julia -O3 -t 8 03_Code_JuliaPure.jl
 echo '+++++++++++++++++++++++++++++'
 
 

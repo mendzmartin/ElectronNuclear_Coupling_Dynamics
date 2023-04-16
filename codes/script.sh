@@ -2,11 +2,13 @@
 
 #$ -cwd
 #$ -m bea -M martinmendez@mi.unc.edu.ar
-#$ -N g200Rc1.5
+#$ -N g512Rc1.5
 #$ -j y
 #$ -pe smp 8
-#$ -o output_Rc_1.5_grid200x200.log
-#$ -q long@compute-0-26,long@compute-0-27,long@compute-0-22,long@compute-0-23
+#$ -o output_Rc_1.5_grid512x512.log
+#$ -q long@compute-0-26,long@compute-0-27,long@compute-0-22,long@compute-0-23,long@compute-0-24
+
+
 ##$ -l h=!compute-0-12&!compute-0-11&!compute-0-10&!compute-0-9&!compute-0-13&!compute-0-7&!compute-0-6&!compute-0-5
 ##$ -S /bin/bash
 ##$ -l mem_free=4.2G

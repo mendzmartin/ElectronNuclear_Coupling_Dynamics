@@ -37,6 +37,22 @@ function Reduced_TimeDependent_Diff_Shannon_Entropy(x_vec,ρ_x_matrix)
     return -1.0 .* Sx_vector;
 end
 
+function integration_argument_renyi_entropy(ρ_x_vector,RenyiFactor)
+    ρlogρ_vec=similar(ρ_x_vector);
+    Threads.@threads for index in 1:length(ρ_x_vector)
+        ρ_x_vector[index]==0.0 ? ρlogρ_vec[index]=0.0 : ρlogρ_vec[index]=ρ_x_vector[index]^RenyiFactor
+    end
+    return ρlogρ_vec
+end
+
+function Reduced_TimeDependent_Renyi_Entropy(x_vec,ρ_x_matrix,RenyiFactor)
+    Sx_vector=similar(ρ_x_matrix[1,:]);
+    Threads.@threads for i in 1:length(Sx_vector)
+        Sx_vector[i]=Trapezoidal_Integration_Method(x_vec,integration_argument_renyi_entropy(ρ_x_matrix[:,i],RenyiFactor));
+    end
+    return Sx_vector .* (1.0/(1.0-RenyiFactor));
+end
+
 function create_initial_state_2D(params;TypeOfFunction="FunctionScalingVariable")
     if TypeOfFunction=="FunctionScalingVariable"
         χ₀,β,ϕₙᵢ,Ω,dΩ = params;
@@ -154,12 +170,14 @@ function write_data(data,outfile_name;delim=" ",matrix_data=false,existing_file=
         for f in 1:length(data[:,1])
             open(outfile_name, "a") do io
                 writedlm(io,[data[f,:]]," ")
+		flush(io)
             end
         end
     else
         for f in 1:length(data)
             open(outfile_name, "a") do io
                 writedlm(io,[data[f]]," ")
+		flush(io)
             end
         end
     end
@@ -174,7 +192,7 @@ end
     # cantidad de FE y dominio espacial
     dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
     # cantidad de FE por dimension (cantidad de intervalos)
-    n_1D_r=300;n_1D_R=300;
+    n_1D_r=180;n_1D_R=180;
     # tamaño del elemento 2D
     ΔrH=abs(dom_2D[2]-dom_2D[1])*(1.0/n_1D_r); ΔRH=abs(dom_2D[4]-dom_2D[3])*(1.0/n_1D_R);
 
@@ -202,6 +220,7 @@ end
     β=3.57*(1.0/(Angstrom_to_au*Angstrom_to_au));
 
     set_Rc_value=1; # set_Rc_value=1 or set_Rc_value=2
+    
     if (set_Rc_value==1)
         Rc=1.5*Angstrom_to_au;  # screening parameter
         χ₀=-3.5*Angstrom_to_au; # Gaussian's center of init state
@@ -217,7 +236,7 @@ end
     aH_2D,bH_2D=bilineal_forms(pH_2D,qH_2D,rH_2D,dΩ_2D);
 
     # solve eigenvalue problem
-    nevH=800;
+    nevH=500;
     probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D,VH_2D;nev=nevH,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
     ϵH_2D,ϕH_2D=solve(probH_2D);
 
@@ -380,6 +399,41 @@ end
     mutual_info_χ_plus_t[:,2:end]=mutual_info_χ[:,:]
     outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
     write_data(mutual_info_χ_plus_t,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
+
+    RenyiFactor=0.9;
+    total_S_2D_χ_Renyi=TimeIndependet_Renyi_Entropy(𝛹ₓₜ_χ,UH_2D_χ,dΩ_2D_χ,RenyiFactor);
+
+    # escribimos los resultados Renyi entropy
+    println("Writing total Renyi entropy")
+    total_S_2D_χ_plus_t_Renyi=Matrix{Float64}(undef,length(total_S_2D_χ_Renyi[:,1]),2)
+    total_S_2D_χ_plus_t_Renyi[:,1]=time_vec[:]
+    total_S_2D_χ_plus_t_Renyi[:,2:end]=total_S_2D_χ_Renyi[:,:]
+    outfile_name = path_images*"total_renyi_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
+    write_data(total_S_2D_χ_plus_t_Renyi,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
+
+    electronic_S_χ_Renyi=Reduced_TimeDependent_Renyi_Entropy(DOF_r,electronic_ρ_matrix_χ,RenyiFactor)
+    println("Writing electronic Renyi entropy")
+    electronic_S_χ_plus_t_Renyi=Matrix{Float64}(undef,length(electronic_S_χ_Renyi[:,1]),2)
+    electronic_S_χ_plus_t_Renyi[:,1]=time_vec[:]
+    electronic_S_χ_plus_t_Renyi[:,2:end]=electronic_S_χ_Renyi[:,:]
+    outfile_name = path_images*"electronic_renyi_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
+    write_data(electronic_S_χ_plus_t_Renyi,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
+
+    nuclear_S_χ_Renyi=Reduced_TimeDependent_Renyi_Entropy(DOF_χ,nuclear_ρ_matrix_χ,RenyiFactor)
+    println("Writing nuclear Renyi entropy")
+    nuclear_S_χ_plus_t_Renyi=Matrix{Float64}(undef,length(nuclear_S_χ_Renyi[:,1]),2)
+    nuclear_S_χ_plus_t_Renyi[:,1]=time_vec[:]
+    nuclear_S_χ_plus_t_Renyi[:,2:end]=nuclear_S_χ_Renyi[:,:]
+    outfile_name = path_images*"nuclear_renyi_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
+    write_data(nuclear_S_χ_plus_t_Renyi,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
+
+    mutual_info_χ_Renyi=electronic_S_χ_Renyi .+ nuclear_S_χ_Renyi .- total_S_2D_χ_Renyi;
+    println("Writing mutual information")
+    mutual_info_χ_plus_t_Renyi=Matrix{Float64}(undef,length(mutual_info_χ_Renyi[:,1]),2)
+    mutual_info_χ_plus_t_Renyi[:,1]=time_vec[:]
+    mutual_info_χ_plus_t_Renyi[:,2:end]=mutual_info_χ_Renyi[:,:]
+    outfile_name = path_images*"mutual_information_renyi_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).dat"
+    write_data(mutual_info_χ_plus_t_Renyi,outfile_name;delim=" ",matrix_data=true,existing_file=existing_data)
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Calculamos valores medios de la posición y varianza, y

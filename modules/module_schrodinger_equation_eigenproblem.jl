@@ -25,7 +25,7 @@ path_plots          = "../outputs/"*name_code*"/plots/";
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
 # activamos el proyecto "gridap_makie" donde se intalarán todos los paquetes
-# import Pkg; Pkg.activate(path_gridap_makie);
+#import Pkg; Pkg.activate(path_gridap_makie);
 
 install_packages=false;
 if install_packages
@@ -387,6 +387,19 @@ function TimeIndependet_Diff_Shannon_Entropy(𝛹ₓ,TrialSpace,dΩ)
         (sum(integrate(ρₓᵢ,dΩ))==0.0) ? (S[i]=0.0) : (S[i]=-sum(integrate(ρₓᵢ*(log∘ρₓᵢ),dΩ)))
     end
     return S;
+end
+
+function TimeIndependet_Renyi_Entropy(𝛹ₓ,TrialSpace,dΩ,RenyiFactor)
+    dim𝛹ₓ=length(𝛹ₓ)
+    S=zeros(Float64,dim𝛹ₓ)
+    Threads.@threads for i in 1:dim𝛹ₓ
+        𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[i],TrialSpace);
+        𝛹ₓᵢ=𝛹ₓᵢ/norm_L2(𝛹ₓᵢ,dΩ);
+        ρₓᵢ=real(𝛹ₓᵢ'*𝛹ₓᵢ)
+        (sum(integrate(ρₓᵢ,dΩ))==0.0) ? (S[i]=0.0) : (S[i]=log(sum(integrate(exp∘(RenyiFactor*(log∘ρₓᵢ)),dΩ))))
+        # (sum(integrate(ρₓᵢ,dΩ))==0.0) ? (S[i]=0.0) : (S[i]=log(sum(integrate(ρₓᵢ,dΩ))))
+    end
+    return S .* (1.0/(1.0-RenyiFactor));
 end
 
 #=

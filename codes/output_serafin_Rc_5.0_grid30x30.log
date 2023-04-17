@@ -1,0 +1,46 @@
+++++++++++++++++++++++++++++++
+incluyendo módulo schrodinger
+incluido módulo schrodinger
+Number of threads = 8
+ΔrH=0.8[Å]; ΔRH=14.61[Å]; ΔχH=0.33[Å]
+n_1D_r*n_1D_R=900 FE
+Set Electron-Nuclear potential
+Writing 2D problem eigenstates and eigenvalues
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.00110579s, CPU 0.000142s)
+Info    : 31 nodes 32 elements
+Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid30x30.msh'...
+Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid30x30.msh'
+Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid30x30.msh'...
+Info    : 3 entities
+Info    : 31 nodes
+Info    : 32 elements
+Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_r_grid30x30.msh'
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 8.6182e-05s, CPU 8.8e-05s)
+Info    : 31 nodes 32 elements
+Info    : Writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid30x30.msh'...
+Info    : Done writing '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid30x30.msh'
+Info    : Reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid30x30.msh'...
+Info    : 3 entities
+Info    : 31 nodes
+Info    : 32 elements
+Info    : Done reading '../outputs/03_Code_JuliaPure/models/simple_line_01_χ_grid30x30.msh'
+Writing initial condition
+Writing convergence information
+Δt=2.18884[fs]; dim(time_vec)=92
+Writing evolution of wave function
+Writing electronic probability density
+Writing nuclear probability density
+Writing total Shannon entropy
+Writing electronic Shannon entropy
+Writing nuclear Shannon entropy
+Writing mutual information
+Writing expectation value of electronic coordinate
+Writing expectation value of nuclear coordinate
+Writing variance of electronic coordinate
+Writing variance of nuclear coordinate
+1188.086034 seconds (2.60 G allocations: 555.916 GiB, 6.41% gc time, 8.34% compilation time: 1% of which was recompilation)
+++++++++++++++++++++++++++++++

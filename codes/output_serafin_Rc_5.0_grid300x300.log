@@ -1,0 +1,10 @@
+++++++++++++++++++++++++++++++
+incluyendo módulo schrodinger
+incluido módulo schrodinger
+Number of threads = 8
+ΔrH=0.08[Å]; ΔRH=1.46[Å]; ΔχH=0.03[Å]
+n_1D_r*n_1D_R=90000 FE
+Set Electron-Nuclear potential
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 88189.0 ON rome40 CANCELLED AT 2023-04-13T00:26:42 DUE TO TIME LIMIT ***
+slurmstepd: error: *** JOB 88189 ON rome40 CANCELLED AT 2023-04-13T00:26:42 DUE TO TIME LIMIT ***

@@ -1,0 +1,11 @@
+++++++++++++++++++++++++++++++
+incluyendo módulo schrodinger
+incluido módulo schrodinger
+Number of threads = 8
+ΔrH=0.13[Å]; ΔRH=2.43[Å]; ΔχH=0.05[Å]
+n_1D_r*n_1D_R=32400 FE
+Set Electron-Nuclear potential
+Writing 2D problem eigenstates and eigenvalues
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 88477.0 ON rome60 CANCELLED AT 2023-04-16T12:51:21 DUE TO TIME LIMIT ***
+slurmstepd: error: *** JOB 88477 ON rome60 CANCELLED AT 2023-04-16T12:51:21 DUE TO TIME LIMIT ***

@@ -1,4 +1,0 @@
-+++++++++++++++++++++++++++++
-/opt/gridengine/default/spool/compute-0-7/job_scripts/150615: line 23: 31372 Killed                  julia -O3 -t 4 03_Code_JuliaPure.jl
-+++++++++++++++++++++++++++++
-+++++++++++++++++++++++++++++

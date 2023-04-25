@@ -1,0 +1,42 @@
+Number of threads = 4
+ΔrH=4.8[Å]; ΔRH=87.65[Å]; ΔχH=1.96[Å]
+n_1D_r*n_1D_R=25 FE
+Set Electron-Nuclear potential
+Writing 2D problem eigenstates and eigenvalues
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.000125191s, CPU 0.000125s)
+Info    : 6 nodes 7 elements
+Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_r_grid5x5.msh'...
+Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_r_grid5x5.msh'
+Info    : Reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_r_grid5x5.msh'...
+Info    : 3 entities
+Info    : 6 nodes
+Info    : 7 elements
+Info    : Done reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_r_grid5x5.msh'
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 9.3042e-05s, CPU 9.3e-05s)
+Info    : 6 nodes 7 elements
+Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_χ_grid5x5.msh'...
+Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_χ_grid5x5.msh'
+Info    : Reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_χ_grid5x5.msh'...
+Info    : 3 entities
+Info    : 6 nodes
+Info    : 7 elements
+Info    : Done reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_χ_grid5x5.msh'
+Writing initial condition
+Writing convergence information
+Δt=2.18884[fs]; dim(time_vec)=92
+Writing evolution of wave function
+Writing electronic probability density
+Writing nuclear probability density
+Writing total Shannon entropy
+Writing electronic Shannon entropy
+Writing nuclear Shannon entropy
+Writing mutual information
+Writing expectation value of electronic coordinate
+Writing expectation value of nuclear coordinate
+Writing variance of electronic coordinate
+Writing variance of nuclear coordinate
+122.880748 seconds (277.52 M allocations: 15.838 GiB, 4.22% gc time, 99.07% compilation time: 1% of which was recompilation)

@@ -2,7 +2,10 @@
 # run command = julia BinaryFileIO_testing.jl
 
 # Write binary file (Array)
-function write_bin(x::Array{T, 1}, fileName::String)::Int64 where T 
+function write_bin(x::Array{T, 1}, fileName::String; existing_file=false)::Int64 where T
+    if existing_file
+        rm(fileName)
+    end
     # Open the file
     io = open(fileName,"w")
     # Cast this number to make sure we know its type
@@ -25,7 +28,7 @@ function write_bin(x::Array{T, 1}, fileName::String)::Int64 where T
 end
 
 # Write binary file (Matrix)
-function write_bin(x::Matrix{T}, fileName::String)::Int64 where T 
+function write_bin(x::Matrix{T}, fileName::String; existing_file=false)::Int64 where T 
     # Open the file
     io = open(fileName,"w")
     # Cast this number to make sure we know its type
@@ -52,7 +55,8 @@ end
 function read_bin(io::IO, ::Type{T}, n::Int64, matrix_data) where T
     # The array to be returned
     (matrix_data==true) ? x = Matrix{T}(undef, (n,n)) : x = Array{T, 1}(undef, n)
-    @time for i in eachindex(x)
+    # @time for i in eachindex(x)
+    for i in eachindex(x)
         x[i] = read(io, T)
     end
     close(io)
@@ -93,51 +97,52 @@ function read_bin(fileName::String, ::Type{T}; matrix_data=false) where T
     end
     # The array to be returned
     (matrix_data==true) ? x = Matrix{T}(undef, (n,n)) : x = Array{T, 1}(undef, n)
-    @time for i in eachindex(x)
+    # @time for i in eachindex(x)
+    for i in eachindex(x)
         x[i] = read(io, T)
     end
     close(io)
     return x
 end
 
-function write_data(data,outfile_name;delim=" ",matrix_data=false,existing_file=false)
-    if existing_file
-        rm(outfile_name)
-    end
-    if matrix_data
-        for f in 1:length(data[:,1])
-            open(outfile_name, "a") do io
-                writedlm(io,[data[f,:]]," ")
-		flush(io)
-            end
-        end
-    else
-        for f in 1:length(data)
-            open(outfile_name, "a") do io
-                writedlm(io,[data[f]]," ")
-		flush(io)
-            end
-        end
-    end
-end
+# function write_data(data,outfile_name;delim=" ",matrix_data=false,existing_file=false)
+#     if existing_file
+#         rm(outfile_name)
+#     end
+#     if matrix_data
+#         for f in 1:length(data[:,1])
+#             open(outfile_name, "a") do io
+#                 writedlm(io,[data[f,:]]," ")
+# 		flush(io)
+#             end
+#         end
+#     else
+#         for f in 1:length(data)
+#             open(outfile_name, "a") do io
+#                 writedlm(io,[data[f]]," ")
+# 		flush(io)
+#             end
+#         end
+#     end
+# end
 
-begin
-    # Warm up
-    n = 1000;
-    data1 = rand(Float64, (n,n));
-    println("Size of data = $(sizeof(data1))")
+# begin
+#     # Warm up
+#     n = 1000;
+#     data1 = rand(Float64, (n,n));
+#     println("Size of data = $(sizeof(data1))")
 
-    binFile = "data.bin"
-    @time write_bin(data1, binFile);
-    # data2 = read_bin(binFile,matrix_data=true);  # better reading
-    # data3 = read_bin(binFile, eltype(data1));   # worst reading
-    println("First method (better) -> size=$(filesize(binFile)/1e6)[MB]")
-    rm(binFile)
+#     binFile = "data.bin"
+#     @time write_bin(data1, binFile);
+#     # data2 = read_bin(binFile,matrix_data=true);  # better reading
+#     # data3 = read_bin(binFile, eltype(data1));   # worst reading
+#     println("First method (better) -> size=$(filesize(binFile)/1e6)[MB]")
+#     rm(binFile)
 
-    using DelimitedFiles;
-    binFile = "data_02.dat"
-    # Timed write read
-    @time write_data(data1,binFile;matrix_data=true);
-    println("Second method (worst) -> size=$(filesize(binFile)/1e6)[MB]")
-    rm(binFile)
-end
+#     using DelimitedFiles;
+#     binFile = "data_02.dat"
+#     # Timed write read
+#     @time write_data(data1,binFile;matrix_data=true);
+#     println("Second method (worst) -> size=$(filesize(binFile)/1e6)[MB]")
+#     rm(binFile)
+# end

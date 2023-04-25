@@ -25,7 +25,7 @@ path_plots          = "../outputs/"*name_code*"/plots/";
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
 # activamos el proyecto "gridap_makie" donde se intalarán todos los paquetes
-# import Pkg; Pkg.activate(path_gridap_makie);
+import Pkg; Pkg.activate(path_gridap_makie);
 
 install_packages=false;
 if install_packages
@@ -262,7 +262,7 @@ end
 =#
 function normalization_eigenstates(ϕ,TrialSpace,dΩ)
     nom_vec=zeros(Float64,length(ϕ))
-    Threads.@threads for i in 1:length(ϕ)
+    Threads.@threads for i in eachindex(ϕ)
         nom_vec[i]=norm_L2(ϕ[i],dΩ)
     end
     return nom_vec;
@@ -273,7 +273,7 @@ end
 =#
 function normalization_eigenstates_multifield(ϕ,TrialSpace,dΩ)
     nom_vec₁₂=zeros(Float64,length(ϕ))
-    Threads.@threads for i in 1:length(ϕ)
+    Threads.@threads for i in eachindex(ϕ)
         ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
         ϕ¹ᵢ,ϕ²ᵢ=ϕᵢ
         nom_vec₁₂[i]=norm_L2(ϕ¹ᵢ,dΩ)+norm_L2(ϕ²ᵢ,dΩ)
@@ -288,10 +288,10 @@ function OrthoCheck_multifield(ϕ,TrialSpace,dΩ)
     nev=length(ϕ)
     OrthoVector=zeros(Float64,nev^2-nev);
     index=1
-    for i in 1:nev
+    for i in eachindex(ϕ)
         ϕᵢ=interpolate_everywhere(ϕ[i],TrialSpace);
         ϕ¹ᵢ,ϕ²ᵢ=ϕᵢ
-        for j in 1:nev
+        for j in eachindex(ϕ)
             if (i ≠ j)
                 ϕⱼ=interpolate_everywhere(ϕ[j],TrialSpace);
                 ϕ¹ⱼ,ϕ²ⱼ=ϕⱼ
@@ -339,11 +339,10 @@ end
     función para calcular la populación de estados
 =#
 function Populations_multifield(𝛹ₓₜ,TrialSpace,dΩ)
-    dimₜ=length(𝛹ₓₜ)
-    p¹ₜ=zeros(Float64,dimₜ);
-    p²ₜ=zeros(Float64,dimₜ);
+    p¹ₜ=zeros(Float64,length(𝛹ₓₜ));
+    p²ₜ=copy(p¹ₜ);
 
-    for i in 1:dimₜ
+    for i in eachindex(𝛹ₓₜ)
         𝛹ₓₜᵢ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace);
         𝛹¹ₓₜᵢ,𝛹²ₓₜᵢ=𝛹ₓₜᵢ
         norm_𝛹¹ₓₜᵢ=norm_L2(𝛹¹ₓₜᵢ,dΩ)
@@ -378,9 +377,8 @@ function pow(x,n)
 end
 
 function TimeIndependet_Diff_Shannon_Entropy(𝛹ₓ,TrialSpace,dΩ)
-    dim𝛹ₓ=length(𝛹ₓ)
-    S=zeros(Float64,dim𝛹ₓ)
-    Threads.@threads for i in 1:dim𝛹ₓ
+    S=zeros(Float64,length(𝛹ₓ))
+    Threads.@threads for i in eachindex(𝛹ₓ)
         𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[i],TrialSpace);
         𝛹ₓᵢ=𝛹ₓᵢ/norm_L2(𝛹ₓᵢ,dΩ);
         ρₓᵢ=real(𝛹ₓᵢ'*𝛹ₓᵢ)
@@ -391,9 +389,8 @@ end
 
 
 function TimeIndependet_Renyi_Entropy(𝛹ₓ,TrialSpace,dΩ,RenyiFactor)
-    dim𝛹ₓ=length(𝛹ₓ)
-    S=zeros(Float64,dim𝛹ₓ)
-    Threads.@threads for i in 1:dim𝛹ₓ
+    S=zeros(Float64,length(𝛹ₓ))
+    Threads.@threads for i in eachindex(𝛹ₓ)
         𝛹ₓᵢ=interpolate_everywhere(𝛹ₓ[i],TrialSpace);
         𝛹ₓᵢ=𝛹ₓᵢ/norm_L2(𝛹ₓᵢ,dΩ);
         ρₓᵢ=real(𝛹ₓᵢ'*𝛹ₓᵢ)
@@ -451,7 +448,7 @@ function CoeffInit_no_orthogonal(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
     InnerProdEigenvecs=zeros(ComplexF64,dim,dim);   # matriz global de inversas de productos internos entre autoestados
     InnerProdBC=zeros(ComplexF64,dim);              # vector global de productos internos entre autoestados y estado inicial
     # primer submatriz n✖n y subvector n✖1
-    for i in 1:dim
+    for i in eachindex(ϕₙ)
         ϕᵢ=interpolate_everywhere(ϕₙ[i],TrialSpace);
         InnerProdBC[i]=sum(∫(ϕᵢ'*𝛹ₓ₀)*dΩ)
         for j in 1:i
@@ -472,9 +469,8 @@ end
         when base functions are orthogonal each other
 =#
 function CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
-    dim=length(ϕₙ)
-    coeffvec₁₂=zeros(ComplexF64,dim); # vector global de productos internos entre autoestados y estado inicial
-    Threads.@threads for i in 1:dim
+    coeffvec₁₂=zeros(ComplexF64,length(ϕₙ)); # vector global de productos internos entre autoestados y estado inicial
+    Threads.@threads for i in eachindex(ϕₙ)
         ϕᵢ=interpolate_everywhere(ϕₙ[i],TrialSpace);
         coeffvec₁₂[i]=sum(∫(ϕᵢ'*𝛹ₓ₀)*dΩ)
     end
@@ -495,17 +491,14 @@ end
     Function to evolve quantum system
 =#
 function evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
-    dim_time=length(time_vec)
     # calculamos los coeficientes de la superposición lineal
     coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
-    𝛹ₓₜ=Vector{CellField}(undef,dim_time);
+    𝛹ₓₜ=Vector{CellField}(undef,length(time_vec));
     # inicializamos en cero el vector de onda
     ϕ₁=interpolate_everywhere(ϕₙ[1],TrialSpace);
-    for i in 1:dim_time
-        𝛹ₓₜ[i]=interpolate_everywhere(0.0*ϕ₁,TrialSpace)
-    end
-    for i in 1:dim_time
-        for j in 1:length(ϵₙ)
+    for i in eachindex(time_vec)
+        𝛹ₓₜ[i]=interpolate_everywhere(0.0*ϕ₁,TrialSpace)    # seteamos a cero 
+        for j in eachindex(ϵₙ)
             𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
             ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
             factor=coeffvec₁₂[j]*exp(-im*(1.0/ħ)*real(ϵₙ[j])*time_vec[i])
@@ -520,23 +513,20 @@ function evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
         end
         # recalculamos los coeficientes de la superposición lineal
         coeffvec₁₂=CoeffInit(𝛹ₓₜ[i],ϕₙ,TrialSpace,dΩ)
-        println("run step = $(i)/$(dim_time)");
+        println("run step = $(i)/$(length(time_vec))");
     end
     return 𝛹ₓₜ;
 end
 
 function evolution_schrodinger_v2(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
-    dim_time=length(time_vec)
     # calculamos los coeficientes de la superposición lineal
     coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
-    𝛹ₓₜ=Vector{CellField}(undef,dim_time);
+    𝛹ₓₜ=Vector{CellField}(undef,length(time_vec));
     # inicializamos en cero el vector de onda
     ϕ₁=interpolate_everywhere(ϕₙ[1],TrialSpace);
-    for i in 1:dim_time
-        𝛹ₓₜ[i]=interpolate_everywhere(0.0*ϕ₁,TrialSpace)
-    end
-    for i in 1:dim_time
-        for j in 1:length(ϵₙ)
+    for i in eachindex(time_vec)
+        𝛹ₓₜ[i]=interpolate_everywhere(0.0*ϕ₁,TrialSpace)    # seteamos a cero 
+        for j in eachindex(ϵₙ)
             𝛹ₓₜⁱ=interpolate_everywhere(𝛹ₓₜ[i],TrialSpace)
             ϕⱼ=interpolate_everywhere(ϕₙ[j],TrialSpace);
             factor=coeffvec₁₂[j]*exp(-im*(1.0/ħ)*real(ϵₙ[j])*time_vec[i])
@@ -554,13 +544,12 @@ function evolution_schrodinger_v2(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec
 end
 
 function evolution_schrodinger_v3(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
-    dim_time=length(time_vec)
     # calculamos los coeficientes de la superposición lineal
     coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
-    𝛹ₓₜ=Vector{CellField}(undef,dim_time);
+    𝛹ₓₜ=Vector{CellField}(undef,length(time_vec));
     factor=similar(ϵₙ)
     # inicializamos en cero el vector de onda
-    Threads.@threads for i in 1:dim_time
+    Threads.@threads for i in eachindex(time_vec)
         𝛹ₓₜ[i] = interpolate_everywhere(0.0*ϕₙ[1],TrialSpace)
         factor .= coeffvec₁₂ .* exp.((-im*(1.0/ħ)*time_vec[i]).*real(ϵₙ))
         for j in 1:length(ϵₙ)

@@ -172,11 +172,11 @@ end
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Resolvemos el problema 2D
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    existing_data=true
+    existing_data=false
     # cantidad de FE y dominio espacial
     dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
     # cantidad de FE por dimension (cantidad de intervalos)
-    n_1D_r=5;n_1D_R=5;
+    n_1D_r=50;n_1D_R=50;
     # tamaño del elemento 2D
     ΔrH=abs(dom_2D[2]-dom_2D[1])*(1.0/n_1D_r); ΔRH=abs(dom_2D[4]-dom_2D[3])*(1.0/n_1D_R);
 
@@ -320,6 +320,9 @@ end
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     𝛹ₓₜ_χ=evolution_schrodinger_v2(𝛹ₓ₀_χ,ϕH_2D_χ,ϵH_2D_χ,UH_2D_χ,dΩ_2D_χ,time_vec); # domino D={r,χ}
     # 𝛹ₓₜ_χ=evolution_schrodinger_v3(𝛹ₓ₀_χ,ϕH_2D_χ,ϵH_2D_χ,UH_2D_χ,dΩ_2D_χ,time_vec); # domino D={r,χ}
+
+    𝛹ₓₜ_matrix=coeff_evolution_schrodinger(𝛹ₓ₀_χ,ϕH_2D_χ,ϵH_2D_χ,UH_2D_χ,dΩ_2D_χ,time_vec);
+    𝛹ₓₜ=wave_function_Gridap(𝛹ₓₜ_matrix,ϕH_2D_χ,UH_2D_χ,dΩ_2D_χ);
 
     println("Writing evolution of wave function")
     index_dat=0

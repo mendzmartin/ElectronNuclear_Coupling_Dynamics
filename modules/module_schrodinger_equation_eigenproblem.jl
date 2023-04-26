@@ -566,3 +566,27 @@ function evolution_schrodinger_v3(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec
     end
     return 𝛹ₓₜ;
 end
+
+function coeff_evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
+    coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
+    exponential_matrix=exp.(-im*(1.0/ħ).*(time_vec*transpose(ϵₙ)))
+    𝛹ₓₜ_matrix=exponential_matrix*coeffvec₁₂
+    return 𝛹ₓₜ_matrix;
+end
+
+function wave_function_Gridap(𝛹ₓₜ_matrix,ϕₙ,TrialSpace,dΩ)
+    𝛹ₓₜ=Vector{CellField}(undef,length(𝛹ₓₜ_matrix[:,1]));
+    Threads.@threads for i in eachindex(𝛹ₓₜ_matrix[:,1])
+        𝛹ₓₜ[i]=interpolate_everywhere(0.0,TrialSpace)    # seteamos a cero
+        for j in eachindex(𝛹ₓₜ_matrix[1,:]) # recorro autovalores (columnas)
+            𝛹ₓₜ[i]=interpolate_everywhere(𝛹ₓₜ[i]+𝛹ₓₜ_matrix[i,j]*ϕₙ[j],TrialSpace)
+        end
+        # normalizamos la función de onda luego de cada evolución
+        norm_switch=true;
+        if norm_switch
+            Norm𝛹ₓₜⁱ=norm_L2(𝛹ₓₜ[i],dΩ)
+            𝛹ₓₜ[i]=interpolate_everywhere(𝛹ₓₜ[i]*(1.0/Norm𝛹ₓₜⁱ),TrialSpace)
+        end
+    end
+    return 𝛹ₓₜ;
+end

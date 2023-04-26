@@ -1,6 +1,6 @@
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.000125575s, CPU 0.000124s)
+Info    : Done meshing 1D (Wall 0.000540267s, CPU 0.000187s)
 Info    : 6 nodes 7 elements
 Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_r_grid5x5.msh'...
 Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_r_grid5x5.msh'
@@ -11,7 +11,7 @@ Info    : 7 elements
 Info    : Done reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_r_grid5x5.msh'
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 9.9686e-05s, CPU 9.9e-05s)
+Info    : Done meshing 1D (Wall 0.000101649s, CPU 0.0001s)
 Info    : 6 nodes 7 elements
 Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_χ_grid5x5.msh'...
 Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_χ_grid5x5.msh'
@@ -38,4 +38,4 @@ Writing expectation value of electronic coordinate
 Writing expectation value of nuclear coordinate
 Writing variance of electronic coordinate
 Writing variance of nuclear coordinate
-118.178537 seconds (269.77 M allocations: 15.409 GiB, 4.31% gc time, 98.88% compilation time: 1% of which was recompilation)
+122.453890 seconds (275.33 M allocations: 15.624 GiB, 4.17% gc time, 99.16% compilation time: 1% of which was recompilation)

@@ -292,13 +292,32 @@ end
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Evolucionamos la función de onda y escribimos resultados
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    𝛹ₓₜ=evolution_schrodinger_v2(𝛹ₓ₀,ϕH_2D,ϵH_2D,UH_2D,dΩ_2D,time_vec); # domino D={r,R}
+    # 𝛹ₓₜ=evolution_schrodinger_v2(𝛹ₓ₀,ϕH_2D,ϵH_2D,UH_2D,dΩ_2D,time_vec); # domino D={r,R}
+    𝛹ₓₜ_matrix=coeff_evolution_schrodinger(𝛹ₓ₀,ϕH_2D,ϵH_2D,UH_2D,dΩ_2D,time_vec);
+    𝛹ₓₜ=wave_function_Gridap(𝛹ₓₜ_matrix,ϕH_2D,UH_2D,dΩ_2D);
 
+    # println("Writing evolution of wave function")
+    # index_dat=0
+    # for i in 1:20:n_points
+    #     global index_dat+=1
+    #     writevtk(Ω_2D,path_images*"evolution_wave_function_domrR_Rcvalue$(set_Rc_value)_grid$(n_1D_r)x$(n_1D_R)_$(lpad(index_dat,3,'0'))",cellfields=["ρₓₜ" => real((𝛹ₓₜ[i])'*𝛹ₓₜ[i])]);
+    # end
+
+    dom_2D_χ=(dom_2D[1],dom_2D[2],dom_2D[3]/γ,dom_2D[4]/γ);
+    model_2D_χ=CartesianDiscreteModel(dom_2D_χ,partition_2D);
+    Ω_2D_χ,dΩ_2D_χ,Γ_2D_χ,dΓ_2D_χ=measures(model_2D_χ,3,dirichlet_tags_2D);
+    VH_2D_χ=TestFESpace(model_2D_χ,reffe_2D;vector_type=Vector{ComplexF64},conformity=:H1,dirichlet_tags=dirichlet_tags_2D);
+    UH_2D_χ=TrialFESpace(VH_2D_χ,dirichlet_values_2D);
+    # escribimos la función de onda en el dominio D={r,χ}
+    𝛹ₓₜ_χ=Vector{CellField}(undef,n_points);
+    Threads.@threads for i in eachindex(time_vec)
+        𝛹ₓₜ_χ[i]=CellField(x->𝛹ₓₜ[i](Point(x[1],γ*x[2]))*sqrt(γ),Ω_2D_χ);
+    end
     println("Writing evolution of wave function")
     index_dat=0
     for i in 1:20:n_points
         global index_dat+=1
-        writevtk(Ω_2D,path_images*"evolution_wave_function_domrR_Rcvalue$(set_Rc_value)_grid$(n_1D_r)x$(n_1D_R)_$(lpad(index_dat,3,'0'))",cellfields=["ρₓₜ" => real((𝛹ₓₜ[i])'*𝛹ₓₜ[i])]);
+        writevtk(Ω_2D_χ,path_images*"evolution_wave_function_domrR_Rcvalue$(set_Rc_value)_grid$(n_1D_r)x$(n_1D_R)_$(lpad(index_dat,3,'0'))",cellfields=["ρₓₜ" => real((𝛹ₓₜ_χ[i])'*𝛹ₓₜ_χ[i])]);
     end
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++

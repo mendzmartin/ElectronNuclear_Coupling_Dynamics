@@ -1,0 +1,42 @@
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.000287965s, CPU 0.000278s)
+Info    : 31 nodes 32 elements
+Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_r_grid30x30.msh'...
+Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_r_grid30x30.msh'
+Info    : Reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_r_grid30x30.msh'...
+Info    : 3 entities
+Info    : 31 nodes
+Info    : 32 elements
+Info    : Done reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_r_grid30x30.msh'
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.000111454s, CPU 0.000109s)
+Info    : 31 nodes 32 elements
+Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_χ_grid30x30.msh'...
+Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_χ_grid30x30.msh'
+Info    : Reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_χ_grid30x30.msh'...
+Info    : 3 entities
+Info    : 31 nodes
+Info    : 32 elements
+Info    : Done reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData/models/simple_line_01_χ_grid30x30.msh'
+Number of threads = 4
+ΔrH=0.8[Å]; ΔRH=14.61[Å]; ΔχH=0.33[Å]
+n_1D_r*n_1D_R=900 FE
+Set Electron-Nuclear potential
+Writing 2D problem eigenstates and eigenvalues
+Writing initial condition
+Writing convergence information
+Δt=2.18884[fs]; dim(time_vec)=92
+Writing evolution of wave function
+Writing electronic probability density
+Writing nuclear probability density
+Writing total Shannon entropy
+Writing electronic Shannon entropy
+Writing nuclear Shannon entropy
+Writing mutual information
+Writing expectation value of electronic coordinate
+Writing expectation value of nuclear coordinate
+Writing variance of electronic coordinate
+Writing variance of nuclear coordinate
+137.936011 seconds (448.71 M allocations: 25.484 GiB, 5.10% gc time, 89.65% compilation time: 1% of which was recompilation)

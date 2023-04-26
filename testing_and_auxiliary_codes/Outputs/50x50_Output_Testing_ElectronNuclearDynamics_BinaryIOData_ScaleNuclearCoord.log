@@ -1,6 +1,6 @@
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.000146019s, CPU 0.000135s)
+Info    : Done meshing 1D (Wall 0.00224993s, CPU 0.000776s)
 Info    : 51 nodes 52 elements
 Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_r_grid50x50.msh'...
 Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_r_grid50x50.msh'
@@ -11,7 +11,7 @@ Info    : 52 elements
 Info    : Done reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_r_grid50x50.msh'
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.000132018s, CPU 0.000135s)
+Info    : Done meshing 1D (Wall 0.000121968s, CPU 0.00012s)
 Info    : 51 nodes 52 elements
 Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_χ_grid50x50.msh'...
 Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_χ_grid50x50.msh'
@@ -24,18 +24,8 @@ Number of threads = 4
 ΔrH=0.48[Å]; ΔRH=8.77[Å]; ΔχH=0.2[Å]
 n_1D_r*n_1D_R=2500 FE
 Set Electron-Nuclear potential
-Writing 2D problem eigenstates and eigenvalues
 Writing initial condition
 Δt=2.18884[fs]; dim(time_vec)=92
-Writing evolution of wave function
 Writing electronic probability density
 Writing nuclear probability density
-Writing total Shannon entropy
-Writing electronic Shannon entropy
-Writing nuclear Shannon entropy
-Writing mutual information
-Writing expectation value of electronic coordinate
-Writing expectation value of nuclear coordinate
-Writing variance of electronic coordinate
-Writing variance of nuclear coordinate
-152.759924 seconds (894.08 M allocations: 34.998 GiB, 6.37% gc time, 75.81% compilation time: 1% of which was recompilation)
+1016.711275 seconds (980.15 M allocations: 60.171 GiB, 1.30% gc time, 11.11% compilation time: 1% of which was recompilation)

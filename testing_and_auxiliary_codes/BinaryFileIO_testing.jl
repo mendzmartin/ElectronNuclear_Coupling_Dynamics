@@ -50,11 +50,11 @@ function write_bin(x::Matrix{T}, fileName::String; existing_file=false)::Int64 w
     return 0;
 end
 
-# Read binary file
-# Sub Function which speeds up the read
-function read_bin(io::IO, ::Type{T}, n::Int64, matrix_data) where T
+# The read function
+# Read binary file ; Sub Function which speeds up the read
+function read_bin(io::IO, ::Type{T}, n::Int64, matrix_data, c_dim) where T
     # The array to be returned
-    (matrix_data==true) ? x = Matrix{T}(undef, (n,n)) : x = Array{T, 1}(undef, n)
+    (matrix_data==true) ? x = Array{T, 2}(undef, n , c_dim) : x = Array{T, 1}(undef, n)
     # @time for i in eachindex(x)
     for i in eachindex(x)
         x[i] = read(io, T)
@@ -63,8 +63,7 @@ function read_bin(io::IO, ::Type{T}, n::Int64, matrix_data) where T
     return x
 end
 
-# The read function
-function read_bin(fileName::String; matrix_data=false)
+function read_bin(fileName::String; matrix_data=false,c_dim=1)
     # Open the file
     io = open(fileName, "r")
     # Read the total number of elements in the resulting array
@@ -79,11 +78,12 @@ function read_bin(fileName::String; matrix_data=false)
     # The return type
     T = eval(Symbol(String(cName)))
     # The data
-    x = read_bin(io, T, n , matrix_data)
+    x = read_bin(io, T, n , matrix_data, c_dim)
     return x
 end
 
-function read_bin(fileName::String, ::Type{T}; matrix_data=false) where T
+# The read function
+function read_bin(fileName::String, ::Type{T}; matrix_data=false,c_dim=1) where T
     # Open the file
     io = open(fileName, "r")
     # Read the total number of elements in the resulting array
@@ -96,7 +96,7 @@ function read_bin(fileName::String, ::Type{T}; matrix_data=false) where T
         cName[i] = read(io, Char)
     end
     # The array to be returned
-    (matrix_data==true) ? x = Matrix{T}(undef, (n,n)) : x = Array{T, 1}(undef, n)
+    (matrix_data==true) ? x = Array{T, 2}(undef, n , c_dim) : x = Array{T, 1}(undef, n)
     # @time for i in eachindex(x)
     for i in eachindex(x)
         x[i] = read(io, T)
@@ -134,7 +134,7 @@ end
 
 #     binFile = "data.bin"
 #     @time write_bin(data1, binFile);
-#     # data2 = read_bin(binFile,matrix_data=true);  # better reading
+#     # data2 = read_bin(binFile; matrix_data=true, c_dim=n);  # better reading
 #     # data3 = read_bin(binFile, eltype(data1));   # worst reading
 #     println("First method (better) -> size=$(filesize(binFile)/1e6)[MB]")
 #     rm(binFile)
@@ -142,7 +142,7 @@ end
 #     using DelimitedFiles;
 #     binFile = "data_02.dat"
 #     # Timed write read
-#     @time write_data(data1,binFile;matrix_data=true);
+#     @time write_data(data1,binFile;matrix_data=true, c_dim=n);
 #     println("Second method (worst) -> size=$(filesize(binFile)/1e6)[MB]")
 #     rm(binFile)
 # end

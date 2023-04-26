@@ -569,8 +569,10 @@ end
 
 function coeff_evolution_schrodinger(𝛹ₓ₀,ϕₙ,ϵₙ,TrialSpace,dΩ,time_vec)
     coeffvec₁₂=CoeffInit(𝛹ₓ₀,ϕₙ,TrialSpace,dΩ)
-    exponential_matrix=exp.(-im*(1.0/ħ).*(time_vec*transpose(ϵₙ)))
-    𝛹ₓₜ_matrix=exponential_matrix*coeffvec₁₂
+    𝛹ₓₜ_matrix=exp.(-im*(1.0/ħ).*(time_vec*transpose(ϵₙ)))
+    for i in eachindex(coeffvec₁₂)
+        𝛹ₓₜ_matrix[:,i] = coeffvec₁₂[i] .* 𝛹ₓₜ_matrix[:,i]
+    end
     return 𝛹ₓₜ_matrix;
 end
 

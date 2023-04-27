@@ -176,11 +176,11 @@ end
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Resolvemos el problema 2D
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    existing_data=true
+    existing_data=false
     # cantidad de FE y dominio espacial
     dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
     # cantidad de FE por dimension (cantidad de intervalos)
-    n_1D_r=50;n_1D_R=50;
+    n_1D_r=300;n_1D_R=300;
     # tamaño del elemento 2D
     ΔrH=abs(dom_2D[2]-dom_2D[1])*(1.0/n_1D_r); ΔRH=abs(dom_2D[4]-dom_2D[3])*(1.0/n_1D_R);
 
@@ -224,7 +224,7 @@ end
     aH_2D,bH_2D=bilineal_forms(pH_2D,qH_2D,rH_2D,dΩ_2D);
 
     # solve eigenvalue problem
-    nevH=500;
+    nevH=600;
     probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D,VH_2D;nev=nevH,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
     ϵH_2D,ϕH_2D=solve(probH_2D);
 
@@ -335,82 +335,82 @@ end
     bin_outfile_name = path_images*"nuclear_density_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
     write_bin(nuclear_ρ_matrix_plus_χ, bin_outfile_name; existing_file=existing_data);
 
-    # # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # # Calculamos las entropías diferenciales de Shannon y
-    # # escribimos resultados. Dominio D={r,χ}
-    # # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # total_S_2D=TimeIndependet_Diff_Shannon_Entropy(𝛹ₓₜ,UH_2D,dΩ_2D)./ γ;
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Calculamos las entropías diferenciales de Shannon y
+    # escribimos resultados. Dominio D={r,χ}
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    total_S_2D=TimeIndependet_Diff_Shannon_Entropy(𝛹ₓₜ,UH_2D,dΩ_2D)./ γ;
 
-    # # escribimos los resultados
-    # println("Writing total Shannon entropy")
-    # total_S_2D_plus_t=Matrix{Float64}(undef,length(total_S_2D[:,1]),2)
-    # total_S_2D_plus_t[:,1]=time_vec[:]
-    # total_S_2D_plus_t[:,2:end]=total_S_2D[:,:]
-    # bin_outfile_name = path_images*"total_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    # write_bin(total_S_2D_plus_t, bin_outfile_name; existing_file=existing_data);
+    # escribimos los resultados
+    println("Writing total Shannon entropy")
+    total_S_2D_plus_t=Matrix{Float64}(undef,length(total_S_2D[:,1]),2)
+    total_S_2D_plus_t[:,1]=time_vec[:]
+    total_S_2D_plus_t[:,2:end]=total_S_2D[:,:]
+    bin_outfile_name = path_images*"total_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
+    write_bin(total_S_2D_plus_t, bin_outfile_name; existing_file=existing_data);
     
 
-    # electronic_S=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_r,electronic_ρ_matrix) ./ γ .+ log(γ)
-    # println("Writing electronic Shannon entropy")
-    # electronic_S_plus_t=Matrix{Float64}(undef,length(electronic_S[:,1]),2)
-    # electronic_S_plus_t[:,1]=time_vec[:]
-    # electronic_S_plus_t[:,2:end]=electronic_S[:,:]
-    # bin_outfile_name = path_images*"electronic_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    # write_bin(electronic_S_plus_t, bin_outfile_name; existing_file=existing_data);
+    electronic_S=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_r,electronic_ρ_matrix) ./ γ .+ log(γ)
+    println("Writing electronic Shannon entropy")
+    electronic_S_plus_t=Matrix{Float64}(undef,length(electronic_S[:,1]),2)
+    electronic_S_plus_t[:,1]=time_vec[:]
+    electronic_S_plus_t[:,2:end]=electronic_S[:,:]
+    bin_outfile_name = path_images*"electronic_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
+    write_bin(electronic_S_plus_t, bin_outfile_name; existing_file=existing_data);
 
-    # nuclear_S=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_R,nuclear_ρ_matrix) ./ γ
-    # println("Writing nuclear Shannon entropy")
-    # nuclear_S_plus_t=Matrix{Float64}(undef,length(nuclear_S[:,1]),2)
-    # nuclear_S_plus_t[:,1]=time_vec[:]
-    # nuclear_S_plus_t[:,2:end]=nuclear_S[:,:]
-    # bin_outfile_name = path_images*"nuclear_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    # write_bin(nuclear_S_plus_t, bin_outfile_name; existing_file=existing_data);
+    nuclear_S=Reduced_TimeDependent_Diff_Shannon_Entropy(DOF_R,nuclear_ρ_matrix) ./ γ
+    println("Writing nuclear Shannon entropy")
+    nuclear_S_plus_t=Matrix{Float64}(undef,length(nuclear_S[:,1]),2)
+    nuclear_S_plus_t[:,1]=time_vec[:]
+    nuclear_S_plus_t[:,2:end]=nuclear_S[:,:]
+    bin_outfile_name = path_images*"nuclear_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
+    write_bin(nuclear_S_plus_t, bin_outfile_name; existing_file=existing_data);
 
-    # mutual_info=(electronic_S ./ γ .+ log(γ)) .+ (nuclear_S .- total_S_2D) ./ γ;
-    # println("Writing mutual information")
-    # mutual_info_plus_t=Matrix{Float64}(undef,length(mutual_info[:,1]),2)
-    # mutual_info_plus_t[:,1]=time_vec[:]
-    # mutual_info_plus_t[:,2:end]=mutual_info[:,:]
-    # bin_outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    # write_bin(mutual_info_plus_t, bin_outfile_name; existing_file=existing_data);
+    mutual_info=(electronic_S ./ γ .+ log(γ)) .+ (nuclear_S .- total_S_2D) ./ γ;
+    println("Writing mutual information")
+    mutual_info_plus_t=Matrix{Float64}(undef,length(mutual_info[:,1]),2)
+    mutual_info_plus_t[:,1]=time_vec[:]
+    mutual_info_plus_t[:,2:end]=mutual_info[:,:]
+    bin_outfile_name = path_images*"mutual_information_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
+    write_bin(mutual_info_plus_t, bin_outfile_name; existing_file=existing_data);
 
-    # # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # # Calculamos valores medios de la posición y varianza, y
-    # # escribimos resultados
-    # # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # # dominio D={r,R}
-    # r_ExpValue=position_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,1) ./ γ ;
-    # println("Writing expectation value of electronic coordinate")
-    # r_ExpValue_plus_t=Matrix{Float64}(undef,length(r_ExpValue[:,1]),2)
-    # r_ExpValue_plus_t[:,1]=time_vec[:]
-    # r_ExpValue_plus_t[:,2:end]=r_ExpValue[:,:]
-    # bin_outfile_name = path_images*"ExpectationValue_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    # write_bin(r_ExpValue_plus_t ./ γ, bin_outfile_name; existing_file=existing_data);
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Calculamos valores medios de la posición y varianza, y
+    # escribimos resultados
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # dominio D={r,R}
+    r_ExpValue=position_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,1) ./ γ ;
+    println("Writing expectation value of electronic coordinate")
+    r_ExpValue_plus_t=Matrix{Float64}(undef,length(r_ExpValue[:,1]),2)
+    r_ExpValue_plus_t[:,1]=time_vec[:]
+    r_ExpValue_plus_t[:,2:end]=r_ExpValue[:,:]
+    bin_outfile_name = path_images*"ExpectationValue_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
+    write_bin(r_ExpValue_plus_t ./ γ, bin_outfile_name; existing_file=existing_data);
 
-    # R_ExpValue=position_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,2) ./ (γ^2);
-    # println("Writing expectation value of nuclear coordinate")
-    # R_ExpValue_plus_t=Matrix{Float64}(undef,length(R_ExpValue[:,1]),2)
-    # R_ExpValue_plus_t[:,1]=time_vec[:]
-    # R_ExpValue_plus_t[:,2:end]=R_ExpValue[:,:]
-    # bin_outfile_name = path_images*"ExpectationValue_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    # write_bin(R_ExpValue_plus_t, bin_outfile_name; existing_file=existing_data);
+    R_ExpValue=position_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,2) ./ (γ^2);
+    println("Writing expectation value of nuclear coordinate")
+    R_ExpValue_plus_t=Matrix{Float64}(undef,length(R_ExpValue[:,1]),2)
+    R_ExpValue_plus_t[:,1]=time_vec[:]
+    R_ExpValue_plus_t[:,2:end]=R_ExpValue[:,:]
+    bin_outfile_name = path_images*"ExpectationValue_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
+    write_bin(R_ExpValue_plus_t, bin_outfile_name; existing_file=existing_data);
 
-    # r²_ExpValue=position²_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,1) ./ (γ^2);
-    # R²_ExpValue=position²_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,2) ./ (γ^3);
+    r²_ExpValue=position²_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,1) ./ (γ^2);
+    R²_ExpValue=position²_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,2) ./ (γ^3);
 
-    # r_variance=sqrt.(r²_ExpValue.-(r_ExpValue.*r_ExpValue));
-    # println("Writing variance of electronic coordinate")
-    # r_variance_plus_t=Matrix{Float64}(undef,length(r_variance[:,1]),2)
-    # r_variance_plus_t[:,1]=time_vec[:]
-    # r_variance_plus_t[:,2:end]=r_variance[:,:]
-    # bin_outfile_name = path_images*"Variance_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    # write_bin(r_variance_plus_t, bin_outfile_name; existing_file=existing_data);
+    r_variance=sqrt.(r²_ExpValue.-(r_ExpValue.*r_ExpValue));
+    println("Writing variance of electronic coordinate")
+    r_variance_plus_t=Matrix{Float64}(undef,length(r_variance[:,1]),2)
+    r_variance_plus_t[:,1]=time_vec[:]
+    r_variance_plus_t[:,2:end]=r_variance[:,:]
+    bin_outfile_name = path_images*"Variance_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
+    write_bin(r_variance_plus_t, bin_outfile_name; existing_file=existing_data);
 
-    # R_variance=sqrt.(R²_ExpValue.-(R_ExpValue.*R_ExpValue));
-    # println("Writing variance of nuclear coordinate")
-    # R_variance_plus_t=Matrix{Float64}(undef,length(R_variance[:,1]),2)
-    # R_variance_plus_t[:,1]=time_vec[:]
-    # R_variance_plus_t[:,2:end]=R_variance[:,:]
-    # bin_outfile_name = path_images*"Variance_R_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    # write_bin(R_variance_plus_t, bin_outfile_name; existing_file=existing_data);
+    R_variance=sqrt.(R²_ExpValue.-(R_ExpValue.*R_ExpValue));
+    println("Writing variance of nuclear coordinate")
+    R_variance_plus_t=Matrix{Float64}(undef,length(R_variance[:,1]),2)
+    R_variance_plus_t[:,1]=time_vec[:]
+    R_variance_plus_t[:,2:end]=R_variance[:,:]
+    bin_outfile_name = path_images*"Variance_R_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
+    write_bin(R_variance_plus_t, bin_outfile_name; existing_file=existing_data);
 end

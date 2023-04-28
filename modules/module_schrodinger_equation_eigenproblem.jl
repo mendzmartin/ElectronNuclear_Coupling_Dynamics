@@ -25,7 +25,7 @@ path_plots          = "../outputs/"*name_code*"/plots/";
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
 # activamos el proyecto "gridap_makie" donde se intalarán todos los paquetes
-import Pkg; Pkg.activate(path_gridap_makie);
+#import Pkg; Pkg.activate(path_gridap_makie);
 
 install_packages=false;
 if install_packages

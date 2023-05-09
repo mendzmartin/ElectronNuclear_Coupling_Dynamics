@@ -324,9 +324,9 @@ end
     println("Writing electronic probability density")
     electronic_ρ_matrix_plus_r=Matrix{Float64}(undef,length(electronic_ρ_matrix[:,1]),length(electronic_ρ_matrix[1,:])+1)
     electronic_ρ_matrix_plus_r[:,1]=DOF_r[:]
-    electronic_ρ_matrix_plus_r[:,2:end]=electronic_ρ_matrix[:,:]
+    electronic_ρ_matrix_plus_r[:,2:end]=electronic_ρ_matrix[:,:] ./ γ
     bin_outfile_name = path_images*"electronic_density_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    write_bin(electronic_ρ_matrix_plus_r ./ γ, bin_outfile_name; existing_file=existing_data);
+    write_bin(electronic_ρ_matrix_plus_r, bin_outfile_name; existing_file=existing_data);
 
     println("Writing nuclear probability density")
     nuclear_ρ_matrix_plus_χ=Matrix{Float64}(undef,length(nuclear_ρ_matrix[:,1]),length(nuclear_ρ_matrix[1,:])+1)
@@ -366,7 +366,7 @@ end
     bin_outfile_name = path_images*"nuclear_shannon_entropy_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
     write_bin(nuclear_S_plus_t, bin_outfile_name; existing_file=existing_data);
 
-    mutual_info=(electronic_S ./ γ .+ log(γ)) .+ (nuclear_S .- total_S_2D) ./ γ;
+    mutual_info=electronic_S .+ nuclear_S .- total_S_2D;
     println("Writing mutual information")
     mutual_info_plus_t=Matrix{Float64}(undef,length(mutual_info[:,1]),2)
     mutual_info_plus_t[:,1]=time_vec[:]
@@ -385,7 +385,7 @@ end
     r_ExpValue_plus_t[:,1]=time_vec[:]
     r_ExpValue_plus_t[:,2:end]=r_ExpValue[:,:]
     bin_outfile_name = path_images*"ExpectationValue_r_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
-    write_bin(r_ExpValue_plus_t ./ γ, bin_outfile_name; existing_file=existing_data);
+    write_bin(r_ExpValue_plus_t, bin_outfile_name; existing_file=existing_data);
 
     R_ExpValue=position_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,2) ./ (γ^2);
     println("Writing expectation value of nuclear coordinate")
@@ -395,7 +395,7 @@ end
     bin_outfile_name = path_images*"ExpectationValue_vs_time_Rc$(round(Rc/Angstrom_to_au;digits=2))_grid$(n_1D_r)x$(n_1D_R).bin"
     write_bin(R_ExpValue_plus_t, bin_outfile_name; existing_file=existing_data);
 
-    r²_ExpValue=position²_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,1) ./ (γ^2);
+    r²_ExpValue=position²_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,1) ./ γ;
     R²_ExpValue=position²_expectation_value(𝛹ₓₜ,Ω_2D,dΩ_2D,UH_2D,2) ./ (γ^3);
 
     r_variance=sqrt.(r²_ExpValue.-(r_ExpValue.*r_ExpValue));

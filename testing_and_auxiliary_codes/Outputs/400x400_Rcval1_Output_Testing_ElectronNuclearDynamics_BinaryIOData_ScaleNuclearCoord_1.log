@@ -1,6 +1,6 @@
 Info    : Meshing 1D...
 Info    : Meshing curve 1 (Line)
-Info    : Done meshing 1D (Wall 0.0141179s, CPU 0.000794s)
+Info    : Done meshing 1D (Wall 0.012857s, CPU 0.000645s)
 Info    : 401 nodes 402 elements
 Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_r_grid400x400.msh'...
 Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_ScaleNuclearCoord/models/simple_line_01_r_grid400x400.msh'
@@ -25,4 +25,4 @@ Writing expectation value of electronic coordinate
 Writing expectation value of nuclear coordinate
 Writing variance of electronic coordinate
 Writing variance of nuclear coordinate
-17721.057151 seconds (285.01 G allocations: 7.053 TiB, 3.93% gc time, 0.29% compilation time: 1% of which was recompilation)
+17760.296510 seconds (285.01 G allocations: 7.053 TiB, 3.99% gc time, 0.28% compilation time: 1% of which was recompilation)

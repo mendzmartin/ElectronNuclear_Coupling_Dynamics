@@ -176,7 +176,7 @@ end
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # Resolvemos el problema 2D
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    existing_data=false
+    existing_data=true
     # cantidad de FE y dominio espacial
     dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
     # cantidad de FE por dimension (cantidad de intervalos)

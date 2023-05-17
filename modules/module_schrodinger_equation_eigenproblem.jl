@@ -25,7 +25,7 @@ path_plots          = "../outputs/"*name_code*"/plots/";
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ =#
 
 # activamos el proyecto "gridap_makie" donde se intalarán todos los paquetes
-#import Pkg; Pkg.activate(path_gridap_makie);
+import Pkg; Pkg.activate(path_gridap_makie);
 
 install_packages=false;
 if install_packages
@@ -209,10 +209,10 @@ function eigenvalue_problem_functions(params;switch_potential = "QHO_1D")
         R₁,R₂,Rc,Rf=params;
         pₕ1_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/m);     # factor para energía cinética
         pₕ2_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/M);     # factor para energía cinética
-        qₕ_ENP_2D(x) = CoulombPotential(x[2],R₁)+CoulombPotential(x[2],R₂)+
+        qₕ_ENP_2D_v2(x) = CoulombPotential(x[2],R₁)+CoulombPotential(x[2],R₂)+
             Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],x[2],Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
-        rₕ_ENP_2D(x) = 1.0;
-        return pₕ1_ENP_2D,pₕ2_ENP_2D,qₕ_ENP_2D,rₕ_ENP_2D;
+        rₕ_ENP_2D_v2(x) = 1.0;
+        return pₕ1_ENP_2D,pₕ2_ENP_2D,qₕ_ENP_2D_v2,rₕ_ENP_2D_v2;
     end
 end
 

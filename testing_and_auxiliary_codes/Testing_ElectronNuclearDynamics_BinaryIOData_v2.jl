@@ -188,7 +188,7 @@ end
     # creamos modelo con elementos cartesianos
     model_2D_χ=CartesianDiscreteModel(dom_2D_χ,partition_2D);
 
-    DOF_r,DOF_χ,pts_χ=space_coord_2D(dom_2D_χ,ΔrH,ΔRH);
+    DOF_r,DOF_χ,pts_χ=space_coord_2D(dom_2D_χ,ΔrH,ΔχH);
 
     # define boundary conditions (full dirichlet)
     dirichlet_values_2D=(0.0+im*0.0);
@@ -240,8 +240,8 @@ end
     # tamaño del elento 1D
     ΔrH_1D=ΔrH;
     ΔχH_1D=ΔχH;
-    dom_1D_r=(dom_2D[1],dom_2D[2]);
-    dom_1D_χ=(dom_2D[3],dom_2D[4]);
+    dom_1D_r=(dom_2D_χ[1],dom_2D_χ[2]);
+    dom_1D_χ=(dom_2D_χ[3],dom_2D_χ[4]);
     # (path,name,dom,MeshSize)
     par_1D_r=(path_models,grid_type*"_01_r_grid$(n_1D_r)x$(n_1D_R)",dom_1D_r,ΔrH_1D);
     par_1D_χ=(path_models,grid_type*"_01_χ_grid$(n_1D_r)x$(n_1D_R)",dom_1D_χ,ΔχH_1D);

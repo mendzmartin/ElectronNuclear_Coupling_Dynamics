@@ -1,7 +1,7 @@
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # módulo para construir grilla (1D)
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-name_code = "Testing_ElectronNuclearDynamics_BinaryIOData";
+name_code = "Testing_ElectronNuclearDynamics_BinaryIOData_v2";
 #import Pkg;Pkg.resolve();Pkg.instantiate();Pkg.precompile()
 include("../modules/module_schrodinger_equation_eigenproblem.jl");
 include("./BinaryFileIO_testing.jl");
@@ -174,31 +174,31 @@ end
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     existing_data=false
     # cantidad de FE y dominio espacial
-    dom_2D=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au*γ,4.9*Angstrom_to_au*γ);
+    dom_2D_χ=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au,4.9*Angstrom_to_au);
     # cantidad de FE por dimension (cantidad de intervalos)
     n_1D_r=50;n_1D_R=50;
     # tamaño del elemento 2D
-    ΔrH=abs(dom_2D[2]-dom_2D[1])*(1.0/n_1D_r); ΔRH=abs(dom_2D[4]-dom_2D[3])*(1.0/n_1D_R);
+    ΔrH=abs(dom_2D_χ[2]-dom_2D_χ[1])*(1.0/n_1D_r); ΔχH=abs(dom_2D_χ[4]-dom_2D_χ[3])*(1.0/n_1D_R);
 
-    println("ΔrH=$(round(ΔrH/Angstrom_to_au,digits=2))[Å]; ΔRH=$(round(ΔRH/Angstrom_to_au,digits=2))[Å]; ΔχH=$(round(ΔRH/(Angstrom_to_au*γ),digits=2))[Å]")
+    println("ΔrH=$(round(ΔrH/Angstrom_to_au,digits=2))[Å]; ΔχH=$(round(ΔχH/(Angstrom_to_au*γ),digits=2))[Å]")
     println("n_1D_r*n_1D_R=$(n_1D_r*n_1D_R) FE")
 
     # grilla de tamaño n²
     partition_2D=(n_1D_r,n_1D_R);
     # creamos modelo con elementos cartesianos
-    model_2D=CartesianDiscreteModel(dom_2D,partition_2D);
+    model_2D_χ=CartesianDiscreteModel(dom_2D_χ,partition_2D);
 
-    DOF_r,DOF_R,pts=space_coord_2D(dom_2D,ΔrH,ΔRH);
+    DOF_r,DOF_χ,pts_χ=space_coord_2D(dom_2D_χ,ΔrH,ΔRH);
 
     # define boundary conditions (full dirichlet)
     dirichlet_values_2D=(0.0+im*0.0);
     dirichlet_tags_2D="boundary";
 
-    Ω_2D,dΩ_2D,Γ_2D,dΓ_2D=measures(model_2D,3,dirichlet_tags_2D);
+    Ω_2D_χ,dΩ_2D_χ,Γ_2D_χ,dΓ_2D_χ=measures(model_2D_χ,3,dirichlet_tags_2D);
     reffe_2D=ReferenceFE(lagrangian,Float64,2);
 
-    VH_2D=TestFESpace(model_2D,reffe_2D;vector_type=Vector{ComplexF64},conformity=:H1,dirichlet_tags=dirichlet_tags_2D);
-    UH_2D=TrialFESpace(VH_2D,dirichlet_values_2D);
+    VH_2D_χ=TestFESpace(model_2D_χ,reffe_2D;vector_type=Vector{ComplexF64},conformity=:H1,dirichlet_tags=dirichlet_tags_2D);
+    UH_2D_χ=TrialFESpace(VH_2D_χ,dirichlet_values_2D);
 
     R₁=-5.0*Angstrom_to_au;R₂=5.0*Angstrom_to_au;Rf=1.5*Angstrom_to_au;
     β=3.57*(1.0/(Angstrom_to_au*Angstrom_to_au));
@@ -216,45 +216,18 @@ end
     end
 
     # Define bilinear forms and FE spaces
-    #= pH_2D,qH_2D,rH_2D=eigenvalue_problem_functions((R₁,R₂,Rc,Rf);switch_potential = "Electron_Nuclear_Potential_2D")
-    aH_2D,bH_2D=bilineal_forms(pH_2D,qH_2D,rH_2D,dΩ_2D); =#
 
     p₁H_2D,p₂H_2D,qH_2D,rH_2D=eigenvalue_problem_functions((R₁,R₂,Rc,Rf);switch_potential = "Electron_Nuclear_Potential_2D_v2")
-    aH_2D,bH_2D=bilineal_forms_v2(p₁H_2D,p₂H_2D,qH_2D,rH_2D,dΩ_2D);
+    aH_2D,bH_2D=bilineal_forms_v2(p₁H_2D,p₂H_2D,qH_2D,rH_2D,dΩ_2D_χ);
 
     # solve eigenvalue problem
-    nevH=5;
-    probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D,VH_2D;nev=nevH,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
-    ϵH_2D,ϕH_2D=solve(probH_2D);
-
-    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # Resolvemos el problema 2D en coordenada nuclear original e
-    #   interpolamos autoestados en esta nueva grilla
-    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    # cantidad de FE y dominio espacial
-    dom_2D_χ=(dom_2D[1],dom_2D[2],dom_2D[3]/γ,dom_2D[4]/γ);
-    ΔχH=ΔRH/γ;
-    # creamos modelo con elementos cartesianos
-    model_2D_χ=CartesianDiscreteModel(dom_2D_χ,partition_2D);
-    Ω_2D_χ,dΩ_2D_χ,Γ_2D_χ,dΓ_2D_χ=measures(model_2D_χ,3,dirichlet_tags_2D);
-    VH_2D_χ=TestFESpace(model_2D_χ,reffe_2D;vector_type=Vector{ComplexF64},conformity=:H1,dirichlet_tags=dirichlet_tags_2D);
-    UH_2D_χ=TrialFESpace(VH_2D_χ,dirichlet_values_2D);
-    DOF_r,DOF_χ,pts_χ=space_coord_2D(dom_2D_χ,ΔrH,ΔχH);
-
-    nevHχ=length(ϵH_2D); # debe cumplirse que nevHχ ≤ nevH
-    ϕH_2D_χ=Vector{CellField}(undef,nevHχ);
-    Threads.@threads for i in 1:nevHχ
-        # le decimos que sea un objeto interpolable
-        ϕHR_2Dₓᵢ=Interpolable(CellField(x->ϕH_2D[i](Point(x[1],x[2]*γ)),Ω_2D));
-        # interpolamos en el nuevo domino y normalizamos
-        ϕH_2D_χ[i]=interpolate_everywhere(ϕHR_2Dₓᵢ,UH_2D_χ) .* sqrt(γ);
-    end
-    ϵH_2D_χ=ϵH_2D[1:nevHχ];
+    nevHχ=500;
+    probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D_χ,VH_2D_χ;nev=nevHχ,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
+    ϵH_2D_χ,ϕH_2D_χ=solve(probH_2D);
 
     # escribimos resultados en formato vtk
     println("Writing 2D problem eigenstates and eigenvalues")
-    Threads.@threads for i in 1:nevH      
+    Threads.@threads for i in 1:10#nevH      
         writevtk(Ω_2D_χ,path_images*"eigenprob_domrχ_2D_Rcvalue$(set_Rc_value)_grid$(n_1D_r)x$(n_1D_R)_num$(i)",cellfields=["ρrχ_eigenstates" => real((ϕH_2D_χ[i])'*ϕH_2D_χ[i])]);
     end
 
@@ -266,9 +239,9 @@ end
     grid_type="simple_line";
     # tamaño del elento 1D
     ΔrH_1D=ΔrH;
-    ΔχH_1D=ΔRH/γ;
+    ΔχH_1D=ΔχH;
     dom_1D_r=(dom_2D[1],dom_2D[2]);
-    dom_1D_χ=(dom_2D[3]./γ,dom_2D[4]./γ);
+    dom_1D_χ=(dom_2D[3],dom_2D[4]);
     # (path,name,dom,MeshSize)
     par_1D_r=(path_models,grid_type*"_01_r_grid$(n_1D_r)x$(n_1D_R)",dom_1D_r,ΔrH_1D);
     par_1D_χ=(path_models,grid_type*"_01_χ_grid$(n_1D_r)x$(n_1D_R)",dom_1D_χ,ΔχH_1D);

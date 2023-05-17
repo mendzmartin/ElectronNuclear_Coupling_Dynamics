@@ -203,12 +203,31 @@ function eigenvalue_problem_functions(params;switch_potential = "QHO_1D")
             Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],x[2]*(1.0/γ),Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
         rₕ_ENP_2D(x) = 1.0;
         return pₕ_ENP_2D,qₕ_ENP_2D,rₕ_ENP_2D;
+    elseif (switch_potential == "Electron_Nuclear_Potential_2D_v2")
+        # caso de potencial tipo interacción electron-nucleo en pozo nuclear
+        @printf("Set Electron-Nuclear potential second version\n");
+        R₁,R₂,Rc,Rf=params;
+        pₕ1_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/m);     # factor para energía cinética
+        pₕ2_ENP_2D(x) = 0.5*(ħ*ħ)*(1.0/M);     # factor para energía cinética
+        qₕ_ENP_2D(x) = CoulombPotential(x[2],R₁)+CoulombPotential(x[2],R₂)+
+            Aprox_Coulomb_Potential(x[1],R₁,Rf)+Aprox_Coulomb_Potential(x[1],x[2],Rc)+Aprox_Coulomb_Potential(x[1],R₂,Rf)
+        rₕ_ENP_2D(x) = 1.0;
+        return pₕ1_ENP_2D,pₕ2_ENP_2D,qₕ_ENP_2D,rₕ_ENP_2D;
     end
 end
 
 # Formas bilineales para problema de autovalores
 function bilineal_forms(p,q,r,dΩ)
     a(u,v) = ∫(p*(∇(v)⋅∇(u))+q*v*u)*dΩ;
+    b(u,v) = ∫(r*u*v)*dΩ;
+    return a,b;
+end
+
+# Formas bilineales para problema de autovalores
+function bilineal_forms_v2(p₁,p₂,q,r,dΩ)
+    e₁ = VectorValue(1.0+im*0.0,0.0+im*0.0)
+    e₂ = VectorValue(1.0+im*0.0,0.0+im*0.0)
+    a(u,v) = ∫(p₁*((∇(v)⋅e₁)⋅(∇(u)⋅e₁))+p₂*((∇(v)⋅e₂)⋅(∇(u)⋅e₂))+q*v*u)*dΩ;
     b(u,v) = ∫(r*u*v)*dΩ;
     return a,b;
 end

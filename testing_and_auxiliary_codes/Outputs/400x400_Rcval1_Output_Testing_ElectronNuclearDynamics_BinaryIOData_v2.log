@@ -1,0 +1,42 @@
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.019007s, CPU 0.000691s)
+Info    : 401 nodes 402 elements
+Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_v2/models/simple_line_01_r_grid400x400.msh'...
+Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_v2/models/simple_line_01_r_grid400x400.msh'
+Info    : Reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_v2/models/simple_line_01_r_grid400x400.msh'...
+Info    : 3 entities
+Info    : 401 nodes
+Info    : 402 elements
+Info    : Done reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_v2/models/simple_line_01_r_grid400x400.msh'
+Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Done meshing 1D (Wall 0.0192149s, CPU 0.000111s)
+Info    : 401 nodes 402 elements
+Info    : Writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_v2/models/simple_line_01_χ_grid400x400.msh'...
+Info    : Done writing '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_v2/models/simple_line_01_χ_grid400x400.msh'
+Info    : Reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_v2/models/simple_line_01_χ_grid400x400.msh'...
+Info    : 3 entities
+Info    : 401 nodes
+Info    : 402 elements
+Info    : Done reading '../outputs/Testing_ElectronNuclearDynamics_BinaryIOData_v2/models/simple_line_01_χ_grid400x400.msh'
+Number of threads = 8
+ΔrH=0.06[Å]; ΔχH=0.0245[Å]
+n_1D_r*n_1D_R=160000 FE
+Set Electron-Nuclear potential second version
+Writing 2D problem eigenstates and eigenvalues
+Writing initial condition
+Writing convergence information
+Δt=2.18884[fs]; dim(time_vec)=92
+Writing evolution of wave function
+Writing electronic probability density
+Writing nuclear probability density
+Writing total Shannon entropy
+Writing electronic Shannon entropy
+Writing nuclear Shannon entropy
+Writing mutual information
+Writing expectation value of electronic coordinate
+Writing expectation value of nuclear coordinate
+Writing variance of electronic coordinate
+Writing variance of nuclear coordinate
+51744.985141 seconds (285.32 G allocations: 8.808 TiB, 0.81% gc time, 0.22% compilation time: <1% of which was recompilation)

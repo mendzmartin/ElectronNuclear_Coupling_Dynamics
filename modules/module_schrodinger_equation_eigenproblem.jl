@@ -225,8 +225,8 @@ end
 
 # Formas bilineales para problema de autovalores
 function bilineal_forms_v2(p₁,p₂,q,r,dΩ)
-    e₁ = VectorValue(1.0+im*0.0,0.0+im*0.0)
-    e₂ = VectorValue(1.0+im*0.0,0.0+im*0.0)
+    e₁ = VectorValue(1.0,0.0)
+    e₂ = VectorValue(0.0,1.0)
     a(u,v) = ∫(p₁*((∇(v)⋅e₁)⋅(∇(u)⋅e₁))+p₂*((∇(v)⋅e₂)⋅(∇(u)⋅e₂))+q*v*u)*dΩ;
     b(u,v) = ∫(r*u*v)*dΩ;
     return a,b;

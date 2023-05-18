@@ -176,7 +176,7 @@ end
     # cantidad de FE y dominio espacial
     dom_2D_χ=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au,4.9*Angstrom_to_au);
     # cantidad de FE por dimension (cantidad de intervalos)
-    n_1D_r=60;n_1D_R=60;
+    n_1D_r=100;n_1D_R=100;
     # tamaño del elemento 2D
     ΔrH=abs(dom_2D_χ[2]-dom_2D_χ[1])*(1.0/n_1D_r); ΔχH=abs(dom_2D_χ[4]-dom_2D_χ[3])*(1.0/n_1D_R);
 

@@ -2,7 +2,7 @@
 
 #$ -cwd
 #$ -m bea -M martinmendez@mi.unc.edu.ar
-#$ -N g400Rc1.5
+#$ -N g100Rc1.5
 #$ -j y
 #$ -pe smp 8
 #$ -q long@compute-0-26,long@compute-0-27,long@compute-0-22,long@compute-0-23,long@compute-0-24

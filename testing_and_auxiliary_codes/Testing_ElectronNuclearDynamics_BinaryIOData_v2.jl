@@ -176,7 +176,7 @@ end
     # cantidad de FE y dominio espacial
     dom_2D_χ=(-12.0*Angstrom_to_au,12.0*Angstrom_to_au,-4.9*Angstrom_to_au,4.9*Angstrom_to_au);
     # cantidad de FE por dimension (cantidad de intervalos)
-    n_1D_r=100;n_1D_R=100;
+    n_1D_r=512;n_1D_R=512;
     # tamaño del elemento 2D
     ΔrH=abs(dom_2D_χ[2]-dom_2D_χ[1])*(1.0/n_1D_r); ΔχH=abs(dom_2D_χ[4]-dom_2D_χ[3])*(1.0/n_1D_R);
 
@@ -221,7 +221,7 @@ end
     aH_2D,bH_2D=bilineal_forms_v2(p₁H_2D,p₂H_2D,qH_2D,rH_2D,dΩ_2D_χ);
 
     # solve eigenvalue problem
-    nevHχ=600;
+    nevHχ=700;
     probH_2D=EigenProblem(aH_2D,bH_2D,UH_2D_χ,VH_2D_χ;nev=nevHχ,tol=10^(-9),maxiter=1000,explicittransform=:none,sigma=-10.0);
     ϵH_2D_χ,ϕH_2D_χ=solve(probH_2D);
 

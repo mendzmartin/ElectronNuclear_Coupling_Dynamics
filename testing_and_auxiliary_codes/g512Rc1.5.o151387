@@ -1,0 +1,1 @@
+./script_run.sh: line 13: 12743 Killed                  julia -O3 -t 8 ${namecode3}.jl > ${path}${dim}x${dim}_Rcval${Rc_value}_Output_${namecode3}.log

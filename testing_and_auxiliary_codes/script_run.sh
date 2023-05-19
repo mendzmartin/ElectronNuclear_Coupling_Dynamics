@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dim=100
+dim=512
 Rc_value=1
 path=./Outputs/
 
